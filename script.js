@@ -2,11 +2,8 @@
 let amount = document.getElementById("amount");
 let fromCurrency = document.getElementById("from-currency");
 let toCurrency = document.getElementById("to-currency");
-let conversionRate;
 let convertedAmmount = document.getElementById("converted-amount");
 let conversionHistory = [];
-let conversionDate;
-
 
 let tableHistory = document.getElementById("history-list")
 
@@ -18,25 +15,19 @@ const exchangeRates = {
     GBP: { USD: 1.33, EUR: 1.14, MXN: 25.10 }
 };
 
-const currenciesInfo = Object.keys(exchangeRates);
 
 function fillCurrencySelectors() {
-    const fromCurrencySelect = document.getElementById('from-currency');
-    const toCurrencySelect = document.getElementById('to-currency');
-
-    fromCurrencySelect.innerHTML = '';
-    toCurrencySelect.innerHTML = '';
-
-    currenciesInfo.forEach(currency => {
+    console.log(Object.keys(exchangeRates));
+    Object.keys(exchangeRates).forEach(currency => {
         const optionFrom = document.createElement('option');
         optionFrom.value = currency;
         optionFrom.textContent = currency;
-        fromCurrencySelect.appendChild(optionFrom);
+        fromCurrency.appendChild(optionFrom);
 
         const optionTo = document.createElement('option');
         optionTo.value = currency;
         optionTo.textContent = currency;
-        toCurrencySelect.appendChild(optionTo);
+        toCurrency.appendChild(optionTo);
     });
 }
 fillCurrencySelectors()
@@ -46,7 +37,7 @@ function convertCurrency() {
     const fromCurrencyValue = fromCurrency.value;
     const toCurrencyValue = toCurrency.value;
 
-    if (!amountNumber || isNaN(amountNumber)) {
+    if (!amountNumber || isNaN(amountNumber) || amountNumber <= 0) {
         alert('Por favor, introduce una cantidad válida.');
         return;
     }
@@ -63,11 +54,10 @@ function convertCurrency() {
     convertedAmmount.textContent = result.toFixed(2);
 
     saveToHistory(fromCurrencyValue, toCurrencyValue, amountNumber, result);
-
 }
 
 function changeCurrencies() {
-    let fromCurrencyTemp = fromCurrency.value ;
+    let fromCurrencyTemp = fromCurrency.value;
     fromCurrency.value = toCurrency.value;
     toCurrency.value = fromCurrencyTemp;
 
@@ -81,39 +71,43 @@ function saveToHistory(fromCurrency, toCurrency, amount, result) {
         toCurrency,
         amount,
         result,
-        date: new Date().toLocaleString() 
+        date: new Date().toLocaleString()
     };
 
     conversionHistory.push(item);
 
-    renderHistory(); 
+    addToTable(item)
 }
 
 function renderHistory() {
     tableHistory.innerHTML = '';
 
     conversionHistory.forEach(item => {
-        const row = document.createElement('tr');
-
-        const dateCell = document.createElement('td');
-        dateCell.textContent = item.date;
-        const fromCell = document.createElement('td');
-        fromCell.textContent = item.fromCurrency;
-        const toCell = document.createElement('td');
-        toCell.textContent = item.toCurrency;
-        const amountCell = document.createElement('td');
-        amountCell.textContent = item.amount;
-        const resultCell = document.createElement('td');
-        resultCell.textContent = item.result.toFixed(2);
-
-        row.appendChild(dateCell);
-        row.appendChild(fromCell);
-        row.appendChild(toCell);
-        row.appendChild(amountCell);
-        row.appendChild(resultCell);
-
-        tableHistory.appendChild(row);
+        addToTable(item)
     });
+}
+
+function addToTable(item) {
+    const row = document.createElement('tr');
+
+    const dateCell = document.createElement('td');
+    dateCell.textContent = item.date;
+    const fromCell = document.createElement('td');
+    fromCell.textContent = item.fromCurrency;
+    const toCell = document.createElement('td');
+    toCell.textContent = item.toCurrency;
+    const amountCell = document.createElement('td');
+    amountCell.textContent = item.amount;
+    const resultCell = document.createElement('td');
+    resultCell.textContent = item.result.toFixed(2);
+
+    row.appendChild(dateCell);
+    row.appendChild(fromCell);
+    row.appendChild(toCell);
+    row.appendChild(amountCell);
+    row.appendChild(resultCell);
+
+    tableHistory.appendChild(row);
 }
 
 function deleteHistory() {
