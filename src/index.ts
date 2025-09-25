@@ -1,131 +1,120 @@
-import { convertion } from "./models/convertion";
-// Variables relacionadas a la conversión
-let amount = document.getElementById("amount") as HTMLInputElement;
-let fromCurrency = document.getElementById("from-currency") as HTMLSelectElement;
-let toCurrency = document.getElementById("to-currency") as HTMLSelectElement;
-let convertedAmmount = document.getElementById("converted-amount") as HTMLElement;
-let tableHistory = document.getElementById("history-list") as HTMLElement;
+import { Currency } from "./models/Currency";
+import { ExchangeRate } from "./models/ExchangeRate";
+import { Convertion } from "./models/Convertion";
+import { History } from "./models/History";
 
-type Currency = "USD" | "EUR" | "MXN" | "GBP";
+type CurrencyType = "USD" | "EUR" | "MXN" | "GBP";
 
-let conversionHistory: convertion[] = [];
+export class CurrencyConverterApp {
+  private amount = document.getElementById("amount") as HTMLInputElement;
+  private fromCurrency = document.getElementById("from-currency") as HTMLSelectElement;
+  private toCurrency = document.getElementById("to-currency") as HTMLSelectElement;
+  private convertedAmount = document.getElementById("converted-amount") as HTMLElement;
+  private tableHistory = document.getElementById("history-list") as HTMLElement;
 
-// ESTO SE LLAMARA CON EL API DESPUES
-const exchangeRates: Record<Currency, Record<Currency, number>> = {
-  USD: { USD: 1, EUR: 0.85, MXN: 18.5, GBP: 0.75 },
-  EUR: { USD: 1.18, EUR: 1, MXN: 21.76, GBP: 0.88 },
-  MXN: { USD: 0.054, MXN: 1, EUR: 0.046, GBP: 0.04 },
-  GBP: { USD: 1.33, EUR: 1.14, MXN: 25.0, GBP: 1 },
-};
+  private history = new History();
+  private exchangeRates: ExchangeRate;
 
-function fillCurrencySelectors(): void {
-  Object.keys(exchangeRates).forEach(currency => {
-    const optionFrom = document.createElement("option");
-    optionFrom.value = currency;
-    optionFrom.textContent = currency;
-    fromCurrency.appendChild(optionFrom);
+  constructor() {
+    const rates: Record<CurrencyType, Record<CurrencyType, number>> = {
+      USD: { USD: 1, EUR: 0.85, MXN: 18.5, GBP: 0.75 },
+      EUR: { USD: 1.18, EUR: 1, MXN: 21.76, GBP: 0.88 },
+      MXN: { USD: 0.054, MXN: 1, EUR: 0.046, GBP: 0.04 },
+      GBP: { USD: 1.33, EUR: 1.14, MXN: 25.0, GBP: 1 },
+    };
 
-    const optionTo = document.createElement("option");
-    optionTo.value = currency;
-    optionTo.textContent = currency;
-    toCurrency.appendChild(optionTo);
-  });
-}
-fillCurrencySelectors();
+    this.exchangeRates = new ExchangeRate(rates);
 
-function convertCurrency(): void {
-  const amountNumber: number = parseFloat(amount.value);
-  const fromCurrencyValue: Currency = fromCurrency.value as Currency;
-  const toCurrencyValue: Currency = toCurrency.value as Currency;
-
-  if (!amountNumber || isNaN(amountNumber) || amountNumber <= 0) {
-    alert("Por favor, introduce una cantidad válida.");
-    return;
+    this.fillCurrencySelectors();
+    this.addEventListeners();
   }
 
-  if (fromCurrencyValue === toCurrencyValue) {
-    alert("Las divisas deben ser diferentes.");
-    return;
+  private fillCurrencySelectors(): void {
+    (Object.keys(this.exchangeRates["rates"]) as CurrencyType[]).forEach(currency => {
+      const optionFrom = document.createElement("option");
+      optionFrom.value = currency;
+      optionFrom.textContent = currency;
+      this.fromCurrency.appendChild(optionFrom);
+
+      const optionTo = document.createElement("option");
+      optionTo.value = currency;
+      optionTo.textContent = currency;
+      this.toCurrency.appendChild(optionTo);
+    });
   }
 
-  const rate: number = exchangeRates[fromCurrencyValue][toCurrencyValue];
-  const result: number = amountNumber * rate;
+  private convertCurrency(): void {
+    const amountNumber = parseFloat(this.amount.value);
+    const from = new Currency(this.fromCurrency.value);
+    const to = new Currency(this.toCurrency.value);
 
-  convertedAmmount.textContent = result.toFixed(2);
+    if (!amountNumber || isNaN(amountNumber) || amountNumber <= 0) {
+      alert("Por favor, introduce una cantidad válida.");
+      return;
+    }
 
-  saveToHistory(fromCurrencyValue, toCurrencyValue, amountNumber, result);
+    if (from.getName() === to.getName()) {
+      alert("Las divisas deben ser diferentes.");
+      return;
+    }
+
+    const rate = this.exchangeRates.getRate(from, to);
+    const result = amountNumber * rate;
+
+    this.convertedAmount.textContent = result.toFixed(2);
+
+    const conversion = new Convertion(from, to, amountNumber, result);
+    this.history.addConvertion(conversion);
+    this.addToTable(conversion);
+  }
+
+  private changeCurrencies(): void {
+    const temp = this.fromCurrency.value;
+    this.fromCurrency.value = this.toCurrency.value;
+    this.toCurrency.value = temp;
+    this.convertCurrency();
+  }
+
+  private clearHistory(): void {
+    this.history.clear();
+    this.tableHistory.innerHTML = "";
+  }
+
+  private addToTable(conversion: Convertion): void {
+    const row = document.createElement("tr");
+
+    const dateCell = document.createElement("td");
+    dateCell.textContent = conversion.getDate(); // Ya es string, no uses .toLocaleString()
+
+    const fromCell = document.createElement("td");
+    fromCell.textContent = conversion.getFromCurrency();
+
+    const toCell = document.createElement("td");
+    toCell.textContent = conversion.getToCurrency();
+
+    const amountCell = document.createElement("td");
+    amountCell.textContent = conversion.getAmmount().toFixed(2);
+
+    const resultCell = document.createElement("td");
+    resultCell.textContent = conversion.getResult().toFixed(2);
+
+    row.appendChild(dateCell);
+    row.appendChild(fromCell);
+    row.appendChild(toCell);
+    row.appendChild(amountCell);
+    row.appendChild(resultCell);
+
+    this.tableHistory.appendChild(row);
+  }
+
+  private addEventListeners(): void {
+    document.getElementById("convertBtn")?.addEventListener("click", () => this.convertCurrency());
+    document.getElementById("swapBtn")?.addEventListener("click", () => this.changeCurrencies());
+    document.getElementById("clearHistoryBtn")?.addEventListener("click", () => this.clearHistory());
+  }
 }
 
-function changeCurrencies(): void {
-  const fromCurrencyTemp: string = fromCurrency.value;
-  fromCurrency.value = toCurrency.value;
-  toCurrency.value = fromCurrencyTemp;
-
-  convertCurrency();
-}
-
-function saveToHistory(
-  fromCurrency: string,
-  toCurrency: string,
-  amount: number,
-  result: number
-): void {
-  const item: HistoryItem = {
-    fromCurrency,
-    toCurrency,
-    amount,
-    result,
-    date: new Date().toLocaleString(),
-  };
-  conversionHistory.push(item);
-  addToTable(item);
-}
-
-function renderHistory(): void {
-  tableHistory.innerHTML = "";
-  conversionHistory.forEach(item => {
-    addToTable(item);
-  });
-}
-
-function addToTable(item: HistoryItem): void {
-  const row = document.createElement("tr");
-
-  const dateCell = document.createElement("td");
-  dateCell.textContent = item.date;
-
-  const fromCell = document.createElement("td");
-  fromCell.textContent = item.fromCurrency;
-
-  const toCell = document.createElement("td");
-  toCell.textContent = item.toCurrency;
-
-  const amountCell = document.createElement("td");
-  amountCell.textContent = item.amount.toString();
-
-  const resultCell = document.createElement("td");
-  resultCell.textContent = item.result.toFixed(2);
-
-  row.appendChild(dateCell);
-  row.appendChild(fromCell);
-  row.appendChild(toCell);
-  row.appendChild(amountCell);
-  row.appendChild(resultCell);
-
-  tableHistory.appendChild(row);
-}
-
-function deleteHistory(): void {
-  conversionHistory = [];
-  renderHistory();
-}
-
+// Iniciar app
 document.addEventListener("DOMContentLoaded", () => {
-  const convertBtn = document.getElementById("convertBtn");
-  const changeBtn = document.getElementById("swapBtn");
-  const clearBtn = document.getElementById("clearHistoryBtn");
-
-  convertBtn?.addEventListener("click", convertCurrency);
-  changeBtn?.addEventListener("click", changeCurrencies);
-  clearBtn?.addEventListener("click", deleteHistory);
+  new CurrencyConverterApp();
 });
