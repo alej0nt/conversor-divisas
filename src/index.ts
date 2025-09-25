@@ -1,3 +1,4 @@
+import { convertion } from "./models/convertion";
 // Variables relacionadas a la conversión
 let amount = document.getElementById("amount") as HTMLInputElement;
 let fromCurrency = document.getElementById("from-currency") as HTMLSelectElement;
@@ -5,17 +6,9 @@ let toCurrency = document.getElementById("to-currency") as HTMLSelectElement;
 let convertedAmmount = document.getElementById("converted-amount") as HTMLElement;
 let tableHistory = document.getElementById("history-list") as HTMLElement;
 
-type HistoryItem = {
-  fromCurrency: string;
-  toCurrency: string;
-  amount: number;
-  result: number;
-  date: string;
-};
-
 type Currency = "USD" | "EUR" | "MXN" | "GBP";
 
-let conversionHistory: HistoryItem[] = [];
+let conversionHistory: convertion[] = [];
 
 // ESTO SE LLAMARA CON EL API DESPUES
 const exchangeRates: Record<Currency, Record<Currency, number>> = {
