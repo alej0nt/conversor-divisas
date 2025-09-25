@@ -1,4 +1,4 @@
-import type { Convertion } from "./Convertion";
+import { Convertion } from "./Convertion.js";
 
 export class History {
     private items: Convertion[];

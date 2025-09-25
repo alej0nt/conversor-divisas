@@ -1,7 +1,7 @@
-import { Currency } from "./models/Currency";
-import { ExchangeRate } from "./models/ExchangeRate";
-import { Convertion } from "./models/Convertion";
-import { History } from "./models/History";
+import { Currency } from "./models/Currency.js";
+import { ExchangeRate } from "./models/ExchangeRate.js";
+import { Convertion } from "./models/Convertion.js";
+import { History } from "./models/History.js";
 export class CurrencyConverterApp {
     constructor() {
         this.amount = document.getElementById("amount");
@@ -10,6 +10,7 @@ export class CurrencyConverterApp {
         this.convertedAmount = document.getElementById("converted-amount");
         this.tableHistory = document.getElementById("history-list");
         this.history = new History();
+        console.log("Currency Converter App initialized");
         const rates = {
             USD: { USD: 1, EUR: 0.85, MXN: 18.5, GBP: 0.75 },
             EUR: { USD: 1.18, EUR: 1, MXN: 21.76, GBP: 0.88 },
@@ -21,6 +22,7 @@ export class CurrencyConverterApp {
         this.addEventListeners();
     }
     fillCurrencySelectors() {
+        console.log(this.exchangeRates);
         Object.keys(this.exchangeRates["rates"]).forEach(currency => {
             const optionFrom = document.createElement("option");
             optionFrom.value = currency;

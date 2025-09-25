@@ -1,7 +1,7 @@
-import { Currency } from "./models/Currency";
-import { ExchangeRate } from "./models/ExchangeRate";
-import { Convertion } from "./models/Convertion";
-import { History } from "./models/History";
+import { Currency } from "./models/Currency.js";
+import { ExchangeRate } from "./models/ExchangeRate.js";
+import { Convertion } from "./models/Convertion.js";
+import { History } from "./models/History.js";
 
 type CurrencyType = "USD" | "EUR" | "MXN" | "GBP";
 
@@ -16,6 +16,7 @@ export class CurrencyConverterApp {
   private exchangeRates: ExchangeRate;
 
   constructor() {
+    console.log("Currency Converter App initialized");
     const rates: Record<CurrencyType, Record<CurrencyType, number>> = {
       USD: { USD: 1, EUR: 0.85, MXN: 18.5, GBP: 0.75 },
       EUR: { USD: 1.18, EUR: 1, MXN: 21.76, GBP: 0.88 },
@@ -30,6 +31,7 @@ export class CurrencyConverterApp {
   }
 
   private fillCurrencySelectors(): void {
+    console.log(this.exchangeRates);
     (Object.keys(this.exchangeRates["rates"]) as CurrencyType[]).forEach(currency => {
       const optionFrom = document.createElement("option");
       optionFrom.value = currency;

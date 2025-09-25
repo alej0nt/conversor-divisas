@@ -1,4 +1,4 @@
-import { Currency } from "./Currency";
+import { Currency } from "./Currency.js";
 
 export class Convertion {
     private fromCurrency: string;

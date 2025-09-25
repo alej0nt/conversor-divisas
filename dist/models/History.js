@@ -1,3 +1,4 @@
+import { Convertion } from "./Convertion.js";
 export class History {
     constructor() {
         this.items = [];

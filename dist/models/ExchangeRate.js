@@ -1,3 +1,4 @@
+import { Currency } from "./Currency.js";
 export class ExchangeRate {
     constructor(rates) {
         this.rates = rates;

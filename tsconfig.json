@@ -10,6 +10,7 @@
     "module": "ES6",
     "target": "ES6",
     "types": [],
+    "esModuleInterop": true,
     // For nodejs:
     // "lib": ["esnext"],
     // "types": ["node"],

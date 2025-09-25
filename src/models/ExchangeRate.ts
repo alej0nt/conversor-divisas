@@ -1,4 +1,4 @@
-import type { Currency } from "./Currency";
+import { Currency } from "./Currency.js";
 
 export class ExchangeRate {
   private rates: Record<string, Record<string, number>>;

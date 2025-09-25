@@ -1,4 +1,4 @@
-import { Currency } from "./Currency";
+import { Currency } from "./Currency.js";
 export class Convertion {
     constructor(fromCurrency, toCurrency, ammount, result = 0) {
         this.fromCurrency = fromCurrency.getName();
