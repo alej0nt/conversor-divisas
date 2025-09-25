@@ -33,8 +33,8 @@
             </div>
             
             <div class="actions">
-                <button class="convert-btn" id="convert-btn" onclick="convertCurrency()">Convertir</button>
-                <button class="swap-btn" id="swap-btn" onclick="changeCurrencies()">Cambiar</button>
+                <button class="convertBtn" id="convertBtn">Convertir</button>
+                <button class="swapBtn" id="swapBtn">Cambiar</button>
             </div>
             
             <div class="result-container">
@@ -58,9 +58,11 @@
                 <tbody id="history-list">
                 </tbody>
             </table>
-            <button class="clear-history-btn" id="clear-history-btn" onclick="deleteHistory()">Vaciar Historial</button>
+            <button class="clearHistoryBtn" id="clearHistoryBtn">Vaciar Historial</button>
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <script type="module" src="dist/index.js"></script>
+    
+
 </body>
