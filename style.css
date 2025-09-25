@@ -65,7 +65,7 @@ label {
     margin-top: 10px;
 }
 
-.convert-btn, .swap-btn {
+.convertBtn, .swapBtn {
     background-color: #1abc9c;
     color: white;
     border: none;
@@ -77,7 +77,7 @@ label {
     transition: background-color 0.3s;
 }
 
-.convert-btn:hover, .swap-btn:hover {
+.convertBtn:hover, .swapBtn:hover {
     background-color: #16a085;
 }
 
@@ -141,7 +141,7 @@ label {
     background-color: #bdc3c7;
 }
 
-.clear-history-btn {
+.clearHistoryBtn {
     background-color: #e74c3c;
     color: white;
     border: none;
@@ -153,6 +153,6 @@ label {
     transition: background-color 0.3s;
 }
 
-.clear-history-btn:hover {
+.clearHistoryBtn:hover {
     background-color: #c0392b;
 }
