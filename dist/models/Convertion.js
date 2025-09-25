@@ -1,51 +1,42 @@
 import { Currency } from "./Currency";
-
 export class Convertion {
-    private fromCurrency: string;
-    private toCurrency: string;
-    private ammount: number;
-    private result: number;
-    private date: string;
-
-    constructor(fromCurrency: Currency, toCurrency: Currency, ammount: number, result: number = 0) {
+    constructor(fromCurrency, toCurrency, ammount, result = 0) {
         this.fromCurrency = fromCurrency.getName();
         this.toCurrency = toCurrency.getName();
         this.ammount = ammount;
         this.result = result;
         this.date = new Date().toLocaleString();
     }
-
     // Getters
-    public getFromCurrency(): string {
+    getFromCurrency() {
         return this.fromCurrency;
     }
-    public getToCurrency(): string {
+    getToCurrency() {
         return this.toCurrency;
     }
-    public getAmmount(): number {
+    getAmmount() {
         return this.ammount;
     }
-    public getResult(): number {
+    getResult() {
         return this.result;
     }
-    public getDate(): string {
+    getDate() {
         return this.date;
     }
-
     // Setters
-    public setFromCurrency(fromCurrency: string): void {
+    setFromCurrency(fromCurrency) {
         this.fromCurrency = fromCurrency;
     }
-    public setToCurrency(toCurrency: string): void {
+    setToCurrency(toCurrency) {
         this.toCurrency = toCurrency;
     }
-    public setAmmount(ammount: number): void {
+    setAmmount(ammount) {
         this.ammount = ammount;
     }
-    public setResult(result: number): void {
+    setResult(result) {
         this.result = result;
     }
-    public setDate(date: string): void {
+    setDate(date) {
         this.date = date;
     }
 }
