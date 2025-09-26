@@ -1,11 +1,10 @@
+var _a, _b;
 import { Currency } from "./models/Currency.js";
-import { Conversion } from "./models/Conversion.js";
 import { CurrencyService } from "./services/CurrencyService.js";
 const amount = document.getElementById("amount");
 const fromCurrency = document.getElementById("from-currency");
 const toCurrency = document.getElementById("to-currency");
 const convertedAmount = document.getElementById("converted-amount");
-const tableHistory = document.getElementById("history-list");
 const service = new CurrencyService();
 function fillCurrencySelectors() {
     const rates = service.getRates().getAllRates();
@@ -35,7 +34,6 @@ function convertCurrency() {
     const conversion = service.convert(from, to, amountNumber);
     convertedAmount.textContent = conversion.getResult().toFixed(2);
     service.addConversionToHistory(conversion);
-    addToTable(conversion);
 }
 function changeCurrencies() {
     const temp = fromCurrency.value;
@@ -43,34 +41,6 @@ function changeCurrencies() {
     toCurrency.value = temp;
     convertCurrency();
 }
-function clearHistory() {
-    service.clearHistory();
-    tableHistory.innerHTML = "";
-}
-function addToTable(conversion) {
-    const row = document.createElement("tr");
-    const dateCell = document.createElement("td");
-    dateCell.textContent = conversion.getDate();
-    const fromCell = document.createElement("td");
-    fromCell.textContent = conversion.getFromCurrency();
-    const toCell = document.createElement("td");
-    toCell.textContent = conversion.getToCurrency();
-    const amountCell = document.createElement("td");
-    amountCell.textContent = conversion.getAmount().toFixed(2);
-    const resultCell = document.createElement("td");
-    resultCell.textContent = conversion.getResult().toFixed(2);
-    row.appendChild(dateCell);
-    row.appendChild(fromCell);
-    row.appendChild(toCell);
-    row.appendChild(amountCell);
-    row.appendChild(resultCell);
-    tableHistory.appendChild(row);
-}
-function addEventListeners() {
-    var _a, _b, _c;
-    (_a = document.getElementById("convertBtn")) === null || _a === void 0 ? void 0 : _a.addEventListener("click", () => convertCurrency());
-    (_b = document.getElementById("swapBtn")) === null || _b === void 0 ? void 0 : _b.addEventListener("click", () => changeCurrencies());
-    (_c = document.getElementById("clearHistoryBtn")) === null || _c === void 0 ? void 0 : _c.addEventListener("click", () => clearHistory());
-}
+(_a = document.getElementById("convertBtn")) === null || _a === void 0 ? void 0 : _a.addEventListener("click", () => convertCurrency());
+(_b = document.getElementById("swapBtn")) === null || _b === void 0 ? void 0 : _b.addEventListener("click", () => changeCurrencies());
 fillCurrencySelectors();
-addEventListeners();
