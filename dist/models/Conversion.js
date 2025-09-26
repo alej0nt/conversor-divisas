@@ -7,6 +7,20 @@ export class Conversion {
         this.result = result;
         this.date = new Date().toLocaleString();
     }
+    toJSON() {
+        return {
+            from: this.fromCurrency,
+            to: this.toCurrency,
+            amount: this.amount,
+            result: this.result,
+            date: this.date,
+        };
+    }
+    static fromJSON(data) {
+        const conv = new Conversion(new Currency(data.from), new Currency(data.to), data.amount, data.result);
+        conv.setDate(data.date);
+        return conv;
+    }
     // Getters
     getFromCurrency() {
         return this.fromCurrency;

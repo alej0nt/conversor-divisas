@@ -35,24 +35,12 @@ export class CurrencyService {
         return this.history;
     }
     saveHistoryToStorage() {
-        const plain = this.history.map(c => ({
-            from: c.getFromCurrency(),
-            to: c.getToCurrency(),
-            amount: c.getAmount(),
-            result: c.getResult(),
-            date: c.getDate(),
-        }));
-        localStorage.setItem(HISTORY_KEY, JSON.stringify(plain));
+        localStorage.setItem(HISTORY_KEY, JSON.stringify(this.history.map(c => c.toJSON())));
     }
     loadHistoryFromStorage() {
         const json = localStorage.getItem(HISTORY_KEY);
         if (!json)
             return;
-        const arr = JSON.parse(json);
-        this.history = arr.map(item => {
-            const conv = new Conversion(new Currency(item.from), new Currency(item.to), item.amount, item.result);
-            conv.setDate(item.date);
-            return conv;
-        });
+        this.history = JSON.parse(json).map((item) => Conversion.fromJSON(item));
     }
 }
