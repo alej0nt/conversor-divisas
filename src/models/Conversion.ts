@@ -1,16 +1,16 @@
 import { Currency } from "./Currency.js";
 
-export class Convertion {
+export class Conversion {
     private fromCurrency: string;
     private toCurrency: string;
-    private ammount: number;
+    private amount: number;
     private result: number;
     private date: string;
 
     constructor(fromCurrency: Currency, toCurrency: Currency, ammount: number, result: number = 0) {
         this.fromCurrency = fromCurrency.getName();
         this.toCurrency = toCurrency.getName();
-        this.ammount = ammount;
+        this.amount = ammount;
         this.result = result;
         this.date = new Date().toLocaleString();
     }
@@ -22,8 +22,8 @@ export class Convertion {
     public getToCurrency(): string {
         return this.toCurrency;
     }
-    public getAmmount(): number {
-        return this.ammount;
+    public getAmount(): number {
+        return this.amount;
     }
     public getResult(): number {
         return this.result;
@@ -40,7 +40,7 @@ export class Convertion {
         this.toCurrency = toCurrency;
     }
     public setAmmount(ammount: number): void {
-        this.ammount = ammount;
+        this.amount = ammount;
     }
     public setResult(result: number): void {
         this.result = result;

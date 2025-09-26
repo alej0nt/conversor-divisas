@@ -11,4 +11,7 @@ export class ExchangeRate {
         }
         return this.rates[fromKey][toKey];
     }
+    getAllRates() {
+        return this.rates;
+    }
 }
