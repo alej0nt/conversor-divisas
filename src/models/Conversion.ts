@@ -15,6 +15,22 @@ export class Conversion {
         this.date = new Date().toLocaleString();
     }
 
+    public toJSON(): object {
+        return {
+            from: this.fromCurrency,
+            to: this.toCurrency,
+            amount: this.amount,
+            result: this.result,
+            date: this.date,
+        };
+    }
+
+    public static fromJSON(data: any): Conversion {
+        const conv = new Conversion(new Currency(data.from), new Currency(data.to), data.amount, data.result);
+        conv.setDate(data.date);
+        return conv;
+    }
+
     // Getters
     public getFromCurrency(): string {
         return this.fromCurrency;
