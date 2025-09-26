@@ -6,6 +6,7 @@ type CurrencyType = "USD" | "EUR" | "MXN" | "GBP";
 
 export class CurrencyService {
     private exchangeRates: ExchangeRate;
+    private history: Conversion[];
 
     constructor() {
         const rates: Record<CurrencyType, Record<CurrencyType, number>> = {
@@ -16,6 +17,7 @@ export class CurrencyService {
         };
 
         this.exchangeRates = new ExchangeRate(rates);
+        this.history = new Array<Conversion>();
     }
 
     public getRates(): ExchangeRate {
@@ -26,5 +28,16 @@ export class CurrencyService {
         const rate = this.exchangeRates.getRate(from, to);
         const result = amount * rate;
         return new Conversion(from, to, amount, result);
+    }
+
+    public addConversionToHistory(conversion: Conversion): void {
+        this.history.push(conversion);
+    }
+    public clearHistory(): void {
+        this.history = [];
+    }
+
+    public getHistory(): Conversion[] {
+        return this.history;
     }
 }

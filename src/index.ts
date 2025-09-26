@@ -1,6 +1,5 @@
 import { Currency } from "./models/Currency.js";
 import { Conversion } from "./models/Conversion.js";
-import { History } from "./models/History.js";
 import { CurrencyService } from "./services/CurrencyService.js";
 
 type CurrencyType = "USD" | "EUR" | "MXN" | "GBP";
@@ -11,8 +10,7 @@ const toCurrency = document.getElementById("to-currency") as HTMLSelectElement;
 const convertedAmount = document.getElementById("converted-amount") as HTMLElement;
 const tableHistory = document.getElementById("history-list") as HTMLElement;
 
-let history = new History();
-let service = new CurrencyService();
+const service = new CurrencyService();
 
 function fillCurrencySelectors(): void {
   const rates = service.getRates().getAllRates();
@@ -47,7 +45,7 @@ function convertCurrency(): void {
   const conversion = service.convert(from, to, amountNumber);
   convertedAmount.textContent = conversion.getResult().toFixed(2);
 
-  history.addConversion(conversion);
+  service.addConversionToHistory(conversion);
   addToTable(conversion);
 }
 
@@ -59,7 +57,7 @@ function changeCurrencies(): void {
 }
 
 function clearHistory(): void {
-  history.clear();
+  service.clearHistory();
   tableHistory.innerHTML = "";
 }
 
