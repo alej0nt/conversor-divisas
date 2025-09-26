@@ -1,18 +1,18 @@
-import { Convertion } from "./Convertion.js";
+import { Conversion } from "./Conversion.js";
 
 export class History {
-    private items: Convertion[];
+    private items: Conversion[];
     constructor() {
         this.items = [];
     }
-    public addConvertion(convertion: Convertion): void {
-        this.items.push(convertion);
+    public addConversion(conversion: Conversion): void {
+        this.items.push(conversion);
     }
     public clear(): void {
         this.items = [];
     }
 
-    public getAll(): Convertion[] {
+    public getAll(): Conversion[] {
         return this.items;
     }
 }

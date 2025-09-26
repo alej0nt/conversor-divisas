@@ -17,4 +17,8 @@ export class ExchangeRate {
 
     return this.rates[fromKey][toKey];
   }
+
+  public getAllRates(): Record<string, Record<string, number>> {
+    return this.rates;
+  }
 }

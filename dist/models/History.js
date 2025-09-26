@@ -1,10 +1,10 @@
-import { Convertion } from "./Convertion.js";
+import { Conversion } from "./Conversion.js";
 export class History {
     constructor() {
         this.items = [];
     }
-    addConvertion(convertion) {
-        this.items.push(convertion);
+    addConversion(conversion) {
+        this.items.push(conversion);
     }
     clear() {
         this.items = [];

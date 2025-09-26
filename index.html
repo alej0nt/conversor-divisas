@@ -1,68 +1,67 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Conversor de Divisas</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Conversor de Divisas</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-    <div class="container">
-        <h1>Conversor de Divisas</h1>
-        
-        <div class="converter">
-            <div class="input-container">
-                <label for="amount">Cantidad</label>
-                <input type="number" id="amount" placeholder="Introduce la cantidad" required>
-            </div>
-            
-            <div class="currency-selectors">
-                <div class="select-container">
-                    <label for="from-currency">De</label>
-                    <select id="from-currency">
-                        
-                    </select>
-                </div>
-                
-                <div class="select-container">
-                    <label for="to-currency">A</label>
-                    <select id="to-currency">
-                        
-                    </select>
-                </div>
-            </div>
-            
-            <div class="actions">
-                <button class="convertBtn" id="convertBtn">Convertir</button>
-                <button class="swapBtn" id="swapBtn">Cambiar</button>
-            </div>
-            
-            <div class="result-container">
-                <h2>Resultado</h2>
-                <p id="converted-amount">0</p>
-            </div>
-        </div>
-        
-        <div class="history">
-            <h2>Historial de Conversiones</h2>
-            <table id="history-table">
-                <thead>
-                    <tr>
-                        <th>Fecha</th>
-                        <th>De</th>
-                        <th>A</th>
-                        <th>Cantidad</th>
-                        <th>Resultado</th>
-                    </tr>
-                </thead>
-                <tbody id="history-list">
-                </tbody>
-            </table>
-            <button class="clearHistoryBtn" id="clearHistoryBtn">Vaciar Historial</button>
-        </div>
-    </div>
+  <div class="container">
+    <h1>Conversor de Divisas</h1>
 
-    <script type="module" src="dist/index.js"></script>
-    
+    <!-- INTERFAZ 1: Conversor -->
+    <section id="converter-interface" aria-label="Conversor de divisas">
+      <div class="converter">
+        <div class="input-container">
+          <label for="amount">Cantidad</label>
+          <input type="number" id="amount" placeholder="Introduce la cantidad" required />
+        </div>
 
+        <div class="currency-selectors">
+          <div class="select-container">
+            <label for="from-currency">De</label>
+            <select id="from-currency"></select>
+          </div>
+          <div class="select-container">
+            <label for="to-currency">A</label>
+            <select id="to-currency"></select>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="convertBtn" id="convertBtn">Convertir</button>
+          <button class="swapBtn" id="swapBtn">Cambiar</button>
+        </div>
+
+        <div class="result-container" aria-live="polite">
+          <h2>Resultado</h2>
+          <p id="converted-amount">0</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- INTERFAZ 2: Historial -->
+    <section id="history-interface" aria-label="Historial de conversiones">
+      <div class="history">
+        <h2>Historial de Conversiones</h2>
+        <table id="history-table">
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>De</th>
+              <th>A</th>
+              <th>Cantidad</th>
+              <th>Resultado</th>
+            </tr>
+          </thead>
+          <tbody id="history-list"></tbody>
+        </table>
+        <button class="clearHistoryBtn" id="clearHistoryBtn">Vaciar Historial</button>
+      </div>
+    </section>
+  </div>
+
+  <script type="module" src="dist/index.js"></script>
 </body>
+</html>
