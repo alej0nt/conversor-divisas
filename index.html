@@ -11,7 +11,7 @@
     <h1>Conversor de Divisas</h1>
 
     <!-- INTERFAZ 1: Conversor -->
-    <section id="converter-interface" aria-label="Conversor de divisas">
+    <section aria-label="Conversor de divisas">
       <div class="converter">
         <div class="input-container">
           <label for="amount">Cantidad</label>
@@ -41,8 +41,13 @@
       </div>
     </section>
 
+    <div class="nav-links">
+      <button onclick="location.href='history.html'">Ver Historial</button>
+    </div>
+    
+
     <!-- INTERFAZ 2: Historial -->
-    <section id="history-interface" aria-label="Historial de conversiones">
+    <!-- <section id="history-interface" aria-label="Historial de conversiones">
       <div class="history">
         <h2>Historial de Conversiones</h2>
         <table id="history-table">
@@ -59,7 +64,7 @@
         </table>
         <button class="clearHistoryBtn" id="clearHistoryBtn">Vaciar Historial</button>
       </div>
-    </section>
+    </section> -->
   </div>
 
   <script type="module" src="dist/index.js"></script>

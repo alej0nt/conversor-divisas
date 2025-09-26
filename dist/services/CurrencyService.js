@@ -1,6 +1,7 @@
 import { Currency } from "../models/Currency.js";
 import { Conversion } from "../models/Conversion.js";
 import { ExchangeRate } from "../models/ExchangeRate.js";
+const HISTORY_KEY = "currency_history_v1";
 export class CurrencyService {
     constructor() {
         const rates = {
@@ -10,7 +11,8 @@ export class CurrencyService {
             GBP: { USD: 1.33, EUR: 1.14, MXN: 25.0, GBP: 1 },
         };
         this.exchangeRates = new ExchangeRate(rates);
-        this.history = new Array();
+        this.history = [];
+        this.loadHistoryFromStorage();
     }
     getRates() {
         return this.exchangeRates;
@@ -18,15 +20,39 @@ export class CurrencyService {
     convert(from, to, amount) {
         const rate = this.exchangeRates.getRate(from, to);
         const result = amount * rate;
-        return new Conversion(from, to, amount, result);
+        const conversion = new Conversion(from, to, amount, result);
+        return conversion;
     }
     addConversionToHistory(conversion) {
         this.history.push(conversion);
+        this.saveHistoryToStorage();
     }
     clearHistory() {
         this.history = [];
+        localStorage.removeItem(HISTORY_KEY);
     }
     getHistory() {
         return this.history;
+    }
+    saveHistoryToStorage() {
+        const plain = this.history.map(c => ({
+            from: c.getFromCurrency(),
+            to: c.getToCurrency(),
+            amount: c.getAmount(),
+            result: c.getResult(),
+            date: c.getDate(),
+        }));
+        localStorage.setItem(HISTORY_KEY, JSON.stringify(plain));
+    }
+    loadHistoryFromStorage() {
+        const json = localStorage.getItem(HISTORY_KEY);
+        if (!json)
+            return;
+        const arr = JSON.parse(json);
+        this.history = arr.map(item => {
+            const conv = new Conversion(new Currency(item.from), new Currency(item.to), item.amount, item.result);
+            conv.setDate(item.date);
+            return conv;
+        });
     }
 }

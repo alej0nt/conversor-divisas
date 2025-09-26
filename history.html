@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Historial</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>Historial de Conversiones</h1>
+
+    <section aria-label="Historial de conversiones">
+      <div class="history">
+        <table id="history-table">
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>De</th>
+              <th>A</th>
+              <th>Cantidad</th>
+              <th>Resultado</th>
+            </tr>
+          </thead>
+          <tbody id="history-list"></tbody>
+        </table>
+        <button id="clearHistoryBtn">Vaciar Historial</button>
+      </div>
+    </section>
+
+    <div class="nav-links">
+      <button onclick="location.href='index.html'">Ir al Conversor</button>
+    </div>
+  </div>
+
+  <script type="module" src="dist/history.js"></script>
+</body>
+</html>
