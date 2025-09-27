@@ -1,7 +1,9 @@
 import { Currency } from "./Currency.js";
 export class ExchangeRate {
-    constructor(rates) {
+    constructor(rates, description) {
         this.rates = rates;
+        this.description = description;
+        this.lastUpdated = new Date().toLocaleString();
     }
     getRate(from, to) {
         const fromKey = from.getName();
@@ -13,5 +15,12 @@ export class ExchangeRate {
     }
     getAllRates() {
         return this.rates;
+    }
+    getLastUpdated() {
+        return this.lastUpdated;
+    }
+    convert(from, to, amount) {
+        const rate = this.getRate(from, to);
+        return amount * rate;
     }
 }
