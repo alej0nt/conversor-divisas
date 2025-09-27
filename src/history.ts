@@ -1,18 +1,40 @@
+/**
+ * Punto de entrada para la interfaz de history.
+ * Renderiza la tabla de conversiones y permite limpiar el historial.
+ */
 import { CurrencyService } from "./services/CurrencyService.js";
 
+/**
+ * Tabla donde se muestran las conversiones realizadas.
+ */
 const tableHistory = document.getElementById("history-list") as HTMLElement;
+
+/**
+ * Botón para limpiar el historial de conversiones.
+ */
 const clearBtn = document.getElementById("clearHistoryBtn") as HTMLButtonElement;
 
-const service = new CurrencyService();
+/**
+ * Servicio central que maneja tasas, conversiones e historial.
+ */
+const service : CurrencyService = new CurrencyService();
 
+/**
+ * Renderiza en la tabla el historial de conversiones guardado en el servicio.
+ * - Limpia el contenido actual 
+ * - Recorre el arreglo devuelto por service.getHistory() y por cada Conversion
+ *   crea una fila (<tr>) con las celdas correspondientes.
+ */
 function renderHistory(): void {
   tableHistory.innerHTML = "";
+  // Recorre el historial
   service.getHistory().forEach(conversion => {
-    const row = document.createElement("tr");
+    // Crea una fila por cada conversión
+    const row : HTMLTableRowElement = document.createElement("tr");
     row.innerHTML = `
       <td>${conversion.getDate()}</td>
-      <td>${conversion.getFromCurrency()}</td>
-      <td>${conversion.getToCurrency()}</td>
+      <td>${conversion.getFromCurrency().getDisplayName()}</td>
+      <td>${conversion.getToCurrency().getDisplayName()}</td>
       <td>${conversion.getAmount().toFixed(2)}</td>
       <td>${conversion.getResult().toFixed(2)}</td>
     `;
@@ -20,11 +42,16 @@ function renderHistory(): void {
   });
 }
 
+/**
+ * Limpia el historial en el servicio y vuelve a renderizar la tabla.
+ */
 function clearHistory(): void {
   service.clearHistory();
   renderHistory();
 }
 
+// Listener para botón de limpiar historial
 clearBtn?.addEventListener("click", () => clearHistory());
 
+// Inicializa renderizando el historial actual
 renderHistory();

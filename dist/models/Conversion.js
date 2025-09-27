@@ -1,23 +1,48 @@
 import { Currency } from "./Currency.js";
 import { Transaction } from "./Transaction.js";
+/**
+ * Representa una conversión de divisas.
+ * Extiende de Transaction (que ya guarda las monedas origen, destino y monto)
+ */
 export class Conversion extends Transaction {
+    /**
+     * Crea una nueva conversión de divisas.
+     * @param from Moneda origen.
+     * @param to Moneda destino.
+     * @param amount Cantidad a convertir.
+     * @param result Resultado inicial de la conversión (por defecto 0).
+     */
     constructor(from, to, amount, result = 0) {
-        super(from, to, amount); // llamamos al constructor de la clase base
+        super(from, to, amount);
         this.result = result;
         this.date = new Date().toLocaleString();
     }
+    /** Devuelve el resultado de la conversión. */
     getResult() {
         return this.result;
     }
+    /** Devuelve la fecha en que se realizó la conversión. */
     getDate() {
         return this.date;
     }
+    /**
+     * Permite actualizar el resultado de la conversión.
+     * @param result Nuevo valor convertido.
+     */
     setResult(result) {
         this.result = result;
     }
+    /**
+     * Permite actualizar la fecha de la conversión.
+     * @param date Fecha en formato string.
+     */
     setDate(date) {
         this.date = date;
     }
+    /**
+     * Convierte la conversión a un objeto JSON plano,
+     * para guardar en almacenamiento local.
+     */
     toJSON() {
         return {
             from: this.fromCurrency,
@@ -27,8 +52,15 @@ export class Conversion extends Transaction {
             date: this.date,
         };
     }
+    /**
+     * Crea una instancia de Conversion a partir de un objeto JSON.
+     * @param data Objeto con los datos de la conversión.
+     * @returns Instancia de Conversion reconstruida.
+     */
     static fromJSON(data) {
-        const conv = new Conversion(new Currency(data.from), new Currency(data.to), data.amount, data.result);
+        const from = new Currency(data.from.code, data.from.name, data.from.symbol);
+        const to = new Currency(data.to.code, data.to.name, data.to.symbol);
+        const conv = new Conversion(from, to, data.amount, data.result);
         conv.setDate(data.date);
         return conv;
     }
