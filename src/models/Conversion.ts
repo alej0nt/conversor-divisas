@@ -1,18 +1,30 @@
 import { Currency } from "./Currency.js";
+import { Transaction } from "./Transaction.js";
 
-export class Conversion {
-    private fromCurrency: string;
-    private toCurrency: string;
-    private amount: number;
+export class Conversion extends Transaction {
     private result: number;
     private date: string;
 
-    constructor(fromCurrency: Currency, toCurrency: Currency, ammount: number, result: number = 0) {
-        this.fromCurrency = fromCurrency.getName();
-        this.toCurrency = toCurrency.getName();
-        this.amount = ammount;
+    constructor(from: Currency, to: Currency, amount: number, result: number = 0) {
+        super(from, to, amount); // llamamos al constructor de la clase base
         this.result = result;
         this.date = new Date().toLocaleString();
+    }
+
+    public getResult(): number {
+        return this.result;
+    }
+
+    public getDate(): string {
+        return this.date;
+    }
+
+    public setResult(result: number): void {
+        this.result = result;
+    }
+
+    public setDate(date: string): void {
+        this.date = date;
     }
 
     public toJSON(): object {
@@ -29,39 +41,5 @@ export class Conversion {
         const conv = new Conversion(new Currency(data.from), new Currency(data.to), data.amount, data.result);
         conv.setDate(data.date);
         return conv;
-    }
-
-    // Getters
-    public getFromCurrency(): string {
-        return this.fromCurrency;
-    }
-    public getToCurrency(): string {
-        return this.toCurrency;
-    }
-    public getAmount(): number {
-        return this.amount;
-    }
-    public getResult(): number {
-        return this.result;
-    }
-    public getDate(): string {
-        return this.date;
-    }
-
-    // Setters
-    public setFromCurrency(fromCurrency: string): void {
-        this.fromCurrency = fromCurrency;
-    }
-    public setToCurrency(toCurrency: string): void {
-        this.toCurrency = toCurrency;
-    }
-    public setAmmount(ammount: number): void {
-        this.amount = ammount;
-    }
-    public setResult(result: number): void {
-        this.result = result;
-    }
-    public setDate(date: string): void {
-        this.date = date;
     }
 }

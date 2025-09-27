@@ -2,7 +2,7 @@ import { Currency } from "../models/Currency.js";
 import { Conversion } from "../models/Conversion.js";
 import { ExchangeRate } from "../models/ExchangeRate.js";
 
-const HISTORY_KEY : string = "currency_history_v1";
+const HISTORY_KEY= "currency_history_v1";
 
 export class CurrencyService {
   private exchangeRates: ExchangeRate;
@@ -16,7 +16,8 @@ export class CurrencyService {
       GBP: { USD: 1.33, EUR: 1.14, MXN: 25.0, GBP: 1 },
     };
 
-    this.exchangeRates = new ExchangeRate(rates);
+    const description = "Tasas de cambio actuales en el año 2025"
+    this.exchangeRates = new ExchangeRate(rates, description);
     this.history = [];
     this.loadHistoryFromStorage();
   }
@@ -26,16 +27,12 @@ export class CurrencyService {
   }
 
   public convert(from: Currency, to: Currency, amount: number): Conversion {
-    const rate = this.exchangeRates.getRate(from, to);
-    const result = amount * rate;
+    const result = this.exchangeRates.convert(from, to, amount);
     const conversion = new Conversion(from, to, amount, result);
-    return conversion;
-  }
-
-  public addConversionToHistory(conversion: Conversion): void {
     this.history.push(conversion);
     this.saveHistoryToStorage();
-  }
+    return conversion;
+}
 
   public clearHistory(): void {
     this.history = [];

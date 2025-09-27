@@ -10,7 +10,8 @@ export class CurrencyService {
             MXN: { USD: 0.054, MXN: 1, EUR: 0.046, GBP: 0.04 },
             GBP: { USD: 1.33, EUR: 1.14, MXN: 25.0, GBP: 1 },
         };
-        this.exchangeRates = new ExchangeRate(rates);
+        const description = "Tasas de cambio actuales en el año 2025";
+        this.exchangeRates = new ExchangeRate(rates, description);
         this.history = [];
         this.loadHistoryFromStorage();
     }
@@ -18,14 +19,11 @@ export class CurrencyService {
         return this.exchangeRates;
     }
     convert(from, to, amount) {
-        const rate = this.exchangeRates.getRate(from, to);
-        const result = amount * rate;
+        const result = this.exchangeRates.convert(from, to, amount);
         const conversion = new Conversion(from, to, amount, result);
-        return conversion;
-    }
-    addConversionToHistory(conversion) {
         this.history.push(conversion);
         this.saveHistoryToStorage();
+        return conversion;
     }
     clearHistory() {
         this.history = [];
