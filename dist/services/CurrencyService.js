@@ -44,11 +44,20 @@ export class CurrencyService {
     /**
      * Realiza una conversión entre dos monedas y guarda el resultado en historial.
      */
-    convert(from, to, amount) {
-        // Realiza la conversión usando las tasas de cambio
-        const result = this.exchangeRates.convert(from, to, amount);
+    convert(from, to, amount, exchangeRateCustom) {
+        let result;
+        let rate;
+        if (exchangeRateCustom && exchangeRateCustom > 0) {
+            result = amount * exchangeRateCustom;
+            rate = exchangeRateCustom;
+        }
+        else {
+            // Realiza la conversión usando las tasas de cambio
+            result = this.exchangeRates.convert(from, to, amount);
+            rate = this.exchangeRates.getRate(from, to);
+        }
         // Crea el objeto de conversión y lo guarda en el historial
-        const conversion = new Conversion(from, to, amount, result);
+        const conversion = new Conversion(from, to, amount, result, rate);
         this.history.push(conversion);
         this.saveHistoryToStorage();
         return conversion;

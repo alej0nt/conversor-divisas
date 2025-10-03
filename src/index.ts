@@ -25,6 +25,11 @@ const toCurrency = document.getElementById("to-currency") as HTMLSelectElement;
 const convertedAmount = document.getElementById("converted-amount") as HTMLElement;
 
 /**
+ * Contenedor donde se mostrará el resultado formateado.
+ */
+const exchangeRateCustom = document.getElementById("exchange-rate-custom") as HTMLInputElement;
+
+/**
  * Servicio central que contiene tasas y historial, se encarga de logica.
  */
 const service : CurrencyService = new CurrencyService();
@@ -57,6 +62,7 @@ function fillCurrencySelectors(): void {
  * - Pinta el resultado en el DOM.
  */
 function convertCurrency(): void {
+  console.log(exchangeRateCustom.value);
   const amountNumber : number = parseFloat(amount.value);
   // Obtenemos las monedas seleccionadas segun su código ISO
   const from : Currency = service.getAvailableCurrencies().find(c => c.getCode() === fromCurrency.value)!; //uso de `!` en las búsquedas (find) fuerza que exista la moneda
@@ -72,7 +78,7 @@ function convertCurrency(): void {
     return;
   }
 
-  const conversion : Conversion = service.convert(from, to, amountNumber);
+  const conversion : Conversion = service.convert(from, to, amountNumber, parseFloat(exchangeRateCustom.value));
   convertedAmount.textContent = `${to.getSymbol()} ${conversion.getResult().toFixed(2)}`;
 }
 

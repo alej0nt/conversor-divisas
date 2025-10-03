@@ -12,6 +12,9 @@ export class Conversion extends Transaction {
   // Fecha y hora en que se realizó la conversión.
   private date: string;
 
+  // Tasa de cambio personalizada (opcional)
+  private rate: number;
+
   /**
    * Crea una nueva conversión de divisas.
    * @param from Moneda origen.
@@ -19,10 +22,11 @@ export class Conversion extends Transaction {
    * @param amount Cantidad a convertir.
    * @param result Resultado inicial de la conversión (por defecto 0).
    */
-  constructor(from: Currency, to: Currency, amount: number, result: number = 0) {
+  constructor(from: Currency, to: Currency, amount: number, result: number = 0, rate: number) {
     super(from, to, amount);
     this.result = result;
     this.date = new Date().toLocaleString();
+    this.rate = rate;
   }
 
   /** Devuelve el resultado de la conversión. */
@@ -33,6 +37,11 @@ export class Conversion extends Transaction {
   /** Devuelve la fecha en que se realizó la conversión. */
   public getDate(): string {
     return this.date;
+  }
+
+  /** Devuelve la tasa de cambio personalizada (si existe). */
+  public getRate(): number {
+    return this.rate;
   }
 
   /**
@@ -62,6 +71,7 @@ export class Conversion extends Transaction {
       amount: this.amount,
       result: this.result,
       date: this.date,
+      rate: this.rate
     };
   }
 
@@ -73,7 +83,7 @@ export class Conversion extends Transaction {
   public static fromJSON(data: any): Conversion {
     const from : Currency = new Currency(data.from.code, data.from.name, data.from.symbol);
     const to : Currency = new Currency(data.to.code, data.to.name, data.to.symbol);
-    const conv : Conversion = new Conversion(from, to, data.amount, data.result);
+    const conv : Conversion = new Conversion(from, to, data.amount, data.result, data.rate);
     conv.setDate(data.date);
     return conv;
   }

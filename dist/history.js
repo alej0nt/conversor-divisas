@@ -32,6 +32,7 @@ function renderHistory() {
       <td>${conversion.getFromCurrency().getDisplayName()}</td>
       <td>${conversion.getToCurrency().getDisplayName()}</td>
       <td>${conversion.getAmount().toFixed(2)}</td>
+      <td>${conversion.getRate().toFixed(2)}</td>
       <td>${conversion.getResult().toFixed(2)}</td>
     `;
         tableHistory.appendChild(row);
