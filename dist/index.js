@@ -27,6 +27,18 @@ const exchangeRateCustom = document.getElementById("exchange-rate-custom");
  */
 const service = new CurrencyService();
 /**
+ * Inicializa la aplicación cargando las monedas disponibles y llenando los selects.
+ */
+async function initialize() {
+    try {
+        await service.loadAvailableCurrencies();
+        fillCurrencySelectors();
+    }
+    catch (error) {
+        console.error('Error initializing app:', error);
+    }
+}
+/**
  * Rellena los selects (origen/destino) con las monedas disponibles que provee el servicio.
  * Cada opción muestra el displayName de la moneda (símbolo + nombre + código).
  */
@@ -81,4 +93,4 @@ function changeCurrencies() {
 (_a = document.getElementById("convertBtn")) === null || _a === void 0 ? void 0 : _a.addEventListener("click", () => convertCurrency());
 (_b = document.getElementById("swapBtn")) === null || _b === void 0 ? void 0 : _b.addEventListener("click", () => changeCurrencies());
 // Inicializamos la UI llenando los selects
-fillCurrencySelectors();
+initialize();

@@ -7,6 +7,9 @@ import { Currency } from "../models/Currency.js";
 import { Conversion } from "../models/Conversion.js";
 import { ExchangeRate } from "../models/ExchangeRate.js";
 
+import { ApiService } from "./ApiService.js";
+import type { CurrencyDetails } from "./ApiService.js";
+
 /**
  * Clave usada para guardar el historial en localStorage.
  */
@@ -26,7 +29,7 @@ export class CurrencyService {
   /**
    * Monedas que el usuario puede usar en el conversor.
    */
-  private availableCurrencies: Currency[];
+  private availableCurrencies: Currency[] = [];
 
   constructor() {
     const description = "Tasas de cambio actuales en el año 2025";
@@ -40,14 +43,6 @@ export class CurrencyService {
     }, description);
 
     this.history = [];
-
-    // Catálogo de monedas disponibles en el conversor
-    this.availableCurrencies = [
-      new Currency("USD", "Dólar estadounidense", "$"),
-      new Currency("EUR", "Euro", "€"),
-      new Currency("MXN", "Peso mexicano", "MX$"),
-      new Currency("GBP", "Libra esterlina", "£"),
-    ];
 
     this.loadHistoryFromStorage();
   }
@@ -65,6 +60,27 @@ export class CurrencyService {
   public getAvailableCurrencies(): Currency[] {
     return this.availableCurrencies;
   }
+
+  /**
+   * Carga las monedas disponibles desde el ApiService y las almacena en memoria.
+   */
+  public async loadAvailableCurrencies(): Promise<void> {
+    try {
+      const response = await ApiService.getAvailableCurrencies();
+      if (response?.data) {
+        this.availableCurrencies = Object.entries(response.data as Record<string, CurrencyDetails>).map(([code, details]: [string, CurrencyDetails]) => {
+          return new Currency(
+            code,
+            details.name,
+            details.symbol
+          );
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching available currencies:', error);
+    }
+  }
+
 
   /**
    * Realiza una conversión entre dos monedas y guarda el resultado en historial.
