@@ -7,8 +7,9 @@
 
     // Environment Settings
     // See also https://aka.ms/tsconfig/module
-    "module": "ES6",
-    "target": "ES6",
+    "target": "ES2017",
+    "module": "ES2020",
+    "lib": ["ES2017", "DOM"],
     "types": [],
     "esModuleInterop": true,
     // For nodejs:

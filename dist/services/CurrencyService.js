@@ -5,12 +5,17 @@
 import { Currency } from "../models/Currency.js";
 import { Conversion } from "../models/Conversion.js";
 import { ExchangeRate } from "../models/ExchangeRate.js";
+import { ApiService } from "./ApiService.js";
 /**
  * Clave usada para guardar el historial en localStorage.
  */
 const HISTORY_KEY = "conversion_history";
 export class CurrencyService {
     constructor() {
+        /**
+         * Monedas que el usuario puede usar en el conversor.
+         */
+        this.availableCurrencies = [];
         const description = "Tasas de cambio actuales en el año 2025";
         // Inicializamos las tasas de cambio
         this.exchangeRates = new ExchangeRate({
@@ -20,13 +25,6 @@ export class CurrencyService {
             GBP: { USD: 1.33, EUR: 1.14, MXN: 25.0, GBP: 1 },
         }, description);
         this.history = [];
-        // Catálogo de monedas disponibles en el conversor
-        this.availableCurrencies = [
-            new Currency("USD", "Dólar estadounidense", "$"),
-            new Currency("EUR", "Euro", "€"),
-            new Currency("MXN", "Peso mexicano", "MX$"),
-            new Currency("GBP", "Libra esterlina", "£"),
-        ];
         this.loadHistoryFromStorage();
     }
     /**
@@ -40,6 +38,22 @@ export class CurrencyService {
      */
     getAvailableCurrencies() {
         return this.availableCurrencies;
+    }
+    /**
+     * Carga las monedas disponibles desde el ApiService y las almacena en memoria.
+     */
+    async loadAvailableCurrencies() {
+        try {
+            const response = await ApiService.getAvailableCurrencies();
+            if (response === null || response === void 0 ? void 0 : response.data) {
+                this.availableCurrencies = Object.entries(response.data).map(([code, details]) => {
+                    return new Currency(code, details.name, details.symbol);
+                });
+            }
+        }
+        catch (error) {
+            console.error('Error fetching available currencies:', error);
+        }
     }
     /**
      * Realiza una conversión entre dos monedas y guarda el resultado en historial.
