@@ -90,9 +90,109 @@ input[type="number"]:focus, select:focus {
 /* action buttons container */
 .actions {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     gap: 10px;
     margin-top: 10px;
+}
+
+
+/* ====== RESET ====== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* ====== BASE ====== */
+:root{
+    --bg: #f4f7fa;
+    --card: #ffffff;
+    --text: #333;
+    --muted: #7f8c8d;
+    --accent-green: #1abc9c;
+    --accent-green-600: #16a085;
+    --accent-blue: #3498db;
+    --accent-blue-600: #2980b9;
+    --danger: #e74c3c;
+    --danger-600: #c0392b;
+    --table-head: #34495e;
+    --table-row: #ecf0f1;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: var(--bg);
+    color: var(--text);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    padding-top: 50px;
+}
+
+.container {
+    background-color: var(--card);
+    border-radius: 12px;
+    padding: 5px 30px 30px 30px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+    width: 100%;
+    max-width: 600px;
+    text-align: center;
+}
+
+h1 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+    color: #2c3e50;
+}
+
+/* ====== FORM / CONVERTER ====== */
+.converter {
+    margin-top: 10px;
+}
+
+.input-container, .currency-selectors {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+label {
+    display: block;
+    font-size: 1rem;
+    color: var(--muted);
+    margin-bottom: 6px;
+}
+
+input[type="number"], select {
+    width: 100%;
+    padding: 10px;
+    margin-top: 4px;
+    border-radius: 8px;
+    border: 1px solid #d0d6db;
+    font-size: 1rem;
+    background: #fff;
+    transition: box-shadow 0.15s, border-color 0.15s;
+}
+
+input[type="number"]:focus, select:focus {
+    outline: none;
+    border-color: rgba(52,152,219,0.9);
+    box-shadow: 0 6px 18px rgba(41,128,185,0.08);
+}
+
+/* select spacing */
+.select-container {
+    margin-bottom: 15px;
+}
+
+/* action buttons container - CENTRADOS */
+.actions {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    margin-top: 20px;
+    margin-bottom: 20px;
 }
 
 /* green action buttons (convert / swap) */
@@ -104,9 +204,40 @@ input[type="number"]:focus, select:focus {
     border-radius: 8px;
     cursor: pointer;
     font-size: 1.05rem;
-    width: 48%;
+    min-width: 140px;
     transition: background-color 0.22s, transform 0.18s, box-shadow 0.18s;
     box-shadow: 0 6px 14px rgba(26, 188, 156, 0.12);
+}
+
+/* Botón de swap como ícono circular */
+.swapBtn {
+    min-width: 50px;
+    width: 50px;
+    height: 50px;
+    padding: 0;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    background-color: transparent;
+    color: var(--accent-green);
+    box-shadow: none;
+    border: 2px solid var(--accent-green);
+}
+
+.swapBtn:hover {
+    background-color: rgba(26, 188, 156, 0.1);
+    color: var(--bg);
+    border-color: var(--accent-green-600);
+    transform: translateY(-2px) scale(1.05) rotate(180deg);
+}
+
+.swapBtn:focus {
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(26,188,156,0.12);
+    background-color: rgba(26, 188, 156, 0.05);
 }
 
 .convertBtn:hover, .swapBtn:hover {
@@ -211,6 +342,37 @@ input[type="number"]:focus, select:focus {
 }
 
 /* ====== BOTONES DE NAVEGACIÓN ====== */
+.historyBtnContainer{
+    display: flex;
+    justify-content: flex-end;
+}
+
+/*Ir al historial*/
+.historyBtn {
+    color: var(--accent-green);
+    min-width: 50px;
+    width: 50px;
+    height: 50px;
+    padding: 0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: transparent;
+    border: none; /* ⬅️ Sin borde */
+    cursor: pointer;
+    transition: background-color 0.22s, transform 0.18s;
+}
+
+.historyBtn:hover {
+    background-color: rgba(26, 188, 156, 0.1);
+    transform: translateY(-2px) scale(1.05);
+}
+
+.historyBtn i {
+    color: var(--accent-green);
+    font-size: 24px; /* También puedes cambiar el tamaño */
+}
 .nav-links {
     margin-top: 22px;
     text-align: center;

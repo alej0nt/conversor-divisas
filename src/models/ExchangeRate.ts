@@ -2,74 +2,92 @@ import { Currency } from "./Currency.js";
 
 /**
  * Clase que maneja las tasas de cambio entre diferentes divisas.
- * Aquí se guardan los valores de conversión y se ofrece la lógica
- * para consultar y aplicar esas tasas.
+ * Ahora soporta tasas dinámicas desde la API.
  */
 export class ExchangeRate {
-  // Objeto que guarda las tasas de conversión entre pares de monedas
-  private rates: Record<string, Record<string, number>>;
+    // Cache de tasas de cambio por moneda base
+    private ratesCache: Map<string, Record<string, number>>;
 
-  // Descripción de las tasas de cambio
-  private description: string;
+    // Descripción de las tasas de cambio
+    private description: string;
 
-  // Fecha y hora de la última actualización de las tasas
-  private lastUpdated: string;
+    // Fecha y hora de la última actualización de las tasas
+    private lastUpdated: string;
 
-  /**
-   * Constructor
-   * @param rates Objeto con las tasas de cambio entre divisas.
-   * @param description Texto descriptivo de las tasas cargadas.
-   */
-  constructor(rates: Record<string, Record<string, number>>, description: string) {
-    this.rates = rates;
-    this.description = description;
-    this.lastUpdated = new Date().toLocaleString();
-  }
+    // Tiempo de vida del cache en milisegundos (30 minutos por defecto)
+    private cacheTTL: number = 30 * 60 * 1000;
 
-  /**
-   * Obtiene la tasa de conversión entre dos monedas.
-   * @param from Moneda de origen.
-   * @param to Moneda de destino.
-   * @returns La tasa de conversión numérica.
-   * @throws Error si no existe la tasa entre esas dos divisas.
-   */
-  public getRate(from: Currency, to: Currency): number {
-    const fromKey: string = from.getCode();
-    const toKey: string = to.getCode();
+    // Timestamp de la última actualización del cache
+    private cacheTimestamp: Map<string, number>;
 
-    if (!this.rates[fromKey] || this.rates[fromKey][toKey] === undefined) {
-      throw new Error(`No existe tasa de cambio de ${fromKey} a ${toKey}`);
+    constructor(description: string = "Tasas de cambio desde API") {
+        this.ratesCache = new Map();
+        this.cacheTimestamp = new Map();
+        this.description = description;
+        this.lastUpdated = new Date().toLocaleString();
     }
 
-    return this.rates[fromKey][toKey];
-  }
+    /**
+     * Actualiza las tasas de cambio para una moneda base específica
+     * @param baseCurrency Código de la moneda base
+     * @param rates Objeto con las tasas de cambio
+     */
+    public updateRates(baseCurrency: string, rates: Record<string, number>): void {
+        this.ratesCache.set(baseCurrency, rates);
+        this.cacheTimestamp.set(baseCurrency, Date.now());
+        this.lastUpdated = new Date().toLocaleString();
+    }
 
-  /**
-  * Convierte una cantidad de dinero desde una divisa a otra
-  * usando la tasa correspondiente.
-  * @param from Moneda de origen.
-  * @param to Moneda de destino.
-  * @param amount Cantidad a convertir.
-  * @returns El valor convertido.
-  */
-  public convert(from: Currency, to: Currency, amount: number): number {
-    const rate: number = this.getRate(from, to);
-    return amount * rate;
-  }
+    /**
+     * Verifica si el cache para una moneda base está vigente
+     * @param baseCurrency Código de la moneda base
+     */
+    public isCacheValid(baseCurrency: string): boolean {
+        const timestamp = this.cacheTimestamp.get(baseCurrency);
+        if (!timestamp) return false;
+        return (Date.now() - timestamp) < this.cacheTTL;
+    }
 
-  /**
-   * Devuelve todas las tasas de conversión disponibles.
-   * @returns Objeto con todas las tasas de cambio.
-   */
-  public getAllRates(): Record<string, Record<string, number>> {
-    return this.rates;
-  }
+    /**
+     * Obtiene la tasa de conversión entre dos monedas del cache
+     * @param from Moneda de origen
+     * @param to Moneda de destino
+     * @returns La tasa de conversión numérica o null si no está en cache
+     */
+    public getRateFromCache(from: Currency, to: Currency): number | null {
+        const fromKey = from.getCode();
+        const toKey = to.getCode();
 
-  /**
-   * Devuelve la fecha y hora de la última actualización de las tasas.
-   * @returns Fecha en formato string.
-   */
-  public getLastUpdated(): string {
-    return this.lastUpdated;
-  }
+        // Si las monedas son iguales, la tasa es 1
+        if (fromKey === toKey) return 1;
+
+        const rates = this.ratesCache.get(fromKey);
+        if (!rates || !this.isCacheValid(fromKey)) {
+            return null;
+        }
+
+        return rates[toKey] ?? null;
+    }
+
+    /**
+     * Obtiene todas las tasas almacenadas en cache
+     */
+    public getAllCachedRates(): Map<string, Record<string, number>> {
+        return this.ratesCache;
+    }
+
+    /**
+     * Devuelve la fecha y hora de la última actualización de las tasas
+     */
+    public getLastUpdated(): string {
+        return this.lastUpdated;
+    }
+
+    /**
+     * Limpia el cache de tasas de cambio
+     */
+    public clearCache(): void {
+        this.ratesCache.clear();
+        this.cacheTimestamp.clear();
+    }
 }

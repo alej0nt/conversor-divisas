@@ -1,6 +1,6 @@
 /**
  * Servicio central del conversor de divisas.
- * Maneja las tasas de cambio, las monedas disponibles y el historial de conversiones.
+ * Maneja las tasas de cambio desde la API, las monedas disponibles y el historial de conversiones.
  */
 
 import { Currency } from "../models/Currency.js";
@@ -16,125 +16,161 @@ import type { CurrencyDetails } from "./ApiService.js";
 const HISTORY_KEY: string = "conversion_history";
 
 export class CurrencyService {
-  /**
-   * Objeto con las tasas de cambio.
-   */
-  private exchangeRates: ExchangeRate;
+    /**
+     * Objeto con las tasas de cambio.
+     */
+    private exchangeRates: ExchangeRate;
 
-  /**
-   * Lista con el historial de conversiones realizadas.
-   */
-  private history: Conversion[];
+    /**
+     * Lista con el historial de conversiones realizadas.
+     */
+    private history: Conversion[];
 
-  /**
-   * Monedas que el usuario puede usar en el conversor.
-   */
-  private availableCurrencies: Currency[] = [];
+    /**
+     * Monedas que el usuario puede usar en el conversor.
+     */
+    private availableCurrencies: Currency[] = [];
 
-  constructor() {
-    const description = "Tasas de cambio actuales en el año 2025";
-
-    // Inicializamos las tasas de cambio
-    this.exchangeRates = new ExchangeRate({
-      USD: { USD: 1, EUR: 0.85, MXN: 18.5, GBP: 0.75 },
-      EUR: { USD: 1.18, EUR: 1, MXN: 21.76, GBP: 0.88 },
-      MXN: { USD: 0.054, MXN: 1, EUR: 0.046, GBP: 0.04 },
-      GBP: { USD: 1.33, EUR: 1.14, MXN: 25.0, GBP: 1 },
-    }, description);
-
-    this.history = [];
-
-    this.loadHistoryFromStorage();
-  }
-
-  /**
-   * Retorna el objeto con todas las tasas de cambio.
-   */
-  public getRates(): ExchangeRate {
-    return this.exchangeRates;
-  }
-
-  /**
-   * Retorna todas las monedas disponibles.
-   */
-  public getAvailableCurrencies(): Currency[] {
-    return this.availableCurrencies;
-  }
-
-  /**
-   * Carga las monedas disponibles desde el ApiService y las almacena en memoria.
-   */
-  public async loadAvailableCurrencies(): Promise<void> {
-    try {
-      const response = await ApiService.getAvailableCurrencies();
-      if (response?.data) {
-        this.availableCurrencies = Object.entries(response.data as Record<string, CurrencyDetails>).map(([code, details]: [string, CurrencyDetails]) => {
-          return new Currency(
-            code,
-            details.name,
-            details.symbol
-          );
-        });
-      }
-    } catch (error) {
-      console.error('Error fetching available currencies:', error);
-    }
-  }
-
-
-  /**
-   * Realiza una conversión entre dos monedas y guarda el resultado en historial.
-   */
-  public convert(from: Currency, to: Currency, amount: number, exchangeRateCustom: number): Conversion {
-    let result: number;
-    let rate: number;
-
-    if (exchangeRateCustom && exchangeRateCustom > 0) {
-      result = amount * exchangeRateCustom;
-      rate = exchangeRateCustom;
-    } else {
-      // Realiza la conversión usando las tasas de cambio
-      result = this.exchangeRates.convert(from, to, amount);
-      rate = this.exchangeRates.getRate(from, to);
+    constructor() {
+        const description = "Tasas de cambio desde API";
+        this.exchangeRates = new ExchangeRate(description);
+        this.history = [];
+        this.loadHistoryFromStorage();
     }
 
+    /**
+     * Retorna el objeto con todas las tasas de cambio.
+     */
+    public getRates(): ExchangeRate {
+        return this.exchangeRates;
+    }
 
-    // Crea el objeto de conversión y lo guarda en el historial
-    const conversion: Conversion = new Conversion(from, to, amount, result, rate);
-    this.history.push(conversion);
-    this.saveHistoryToStorage();
-    return conversion;
-  }
+    /**
+     * Retorna todas las monedas disponibles.
+     */
+    public getAvailableCurrencies(): Currency[] {
+        return this.availableCurrencies;
+    }
 
-  /**
-   * Limpia el historial de conversiones y lo borra de localStorage.
-   */
-  public clearHistory(): void {
-    this.history = [];
-    localStorage.removeItem(HISTORY_KEY);
-  }
+    /**
+     * Carga las monedas disponibles desde el ApiService y las almacena en memoria.
+     */
+    public async loadAvailableCurrencies(): Promise<void> {
+        try {
+            const response = await ApiService.getAvailableCurrencies();
+            if (response?.data) {
+                this.availableCurrencies = Object.entries(response.data as Record<string, CurrencyDetails>).map(([code, details]: [string, CurrencyDetails]) => {
+                    return new Currency(
+                        code,
+                        details.name,
+                        details.symbol
+                    );
+                });
+            }
+        } catch (error) {
+            console.error('Error fetching available currencies:', error);
+            throw error;
+        }
+    }
 
-  /**
-   * Retorna el historial de conversiones en memoria.
-   */
-  public getHistory(): Conversion[] {
-    return this.history;
-  }
+    /**
+     * Obtiene las tasas de cambio para una moneda base desde la API
+     * @param baseCurrency Código de la moneda base
+     */
+    public async loadExchangeRates(baseCurrency: string): Promise<void> {
+        try {
+            // Verificar si ya tenemos las tasas en cache y son válidas
+            if (this.exchangeRates.isCacheValid(baseCurrency)) {
+                return;
+            }
 
-  /**
-   * Guarda el historial actual en localStorage.
-   */
-  private saveHistoryToStorage(): void {
-    localStorage.setItem(HISTORY_KEY, JSON.stringify(this.history.map((c: Conversion) => c.toJSON())));
-  }
+            const response = await ApiService.getExchangeRates(baseCurrency);
+            if (response?.data) {
+                this.exchangeRates.updateRates(baseCurrency, response.data);
+            }
+        } catch (error) {
+            console.error('Error loading exchange rates:', error);
+            throw error;
+        }
+    }
 
-  /**
-   * Carga el historial desde localStorage (si existe).
-   */
-  private loadHistoryFromStorage(): void {
-    const json: string | null = localStorage.getItem(HISTORY_KEY);
-    if (!json) return;
-    // Convierte cada objeto JSON en una instancia de Conversion
-    this.history = JSON.parse(json).map((item: any) => Conversion.fromJSON(item));
-  }
+    /**
+     * Realiza una conversión entre dos monedas y guarda el resultado en historial.
+     * Si se proporciona una tasa personalizada, la usa; de lo contrario, consulta la API.
+     */
+    public async convert(from: Currency, to: Currency, amount: number, exchangeRateCustom?: number): Promise<Conversion> {
+        let result: number;
+        let rate: number;
+
+        if (exchangeRateCustom && exchangeRateCustom > 0) {
+            // Usar tasa personalizada
+            result = amount * exchangeRateCustom;
+            rate = exchangeRateCustom;
+        } else {
+            // Intentar obtener la tasa del cache
+            let cachedRate = this.exchangeRates.getRateFromCache(from, to);
+
+            if (cachedRate === null) {
+                // Si no está en cache o expiró, cargar desde la API
+                await this.loadExchangeRates(from.getCode());
+                cachedRate = this.exchangeRates.getRateFromCache(from, to);
+
+                if (cachedRate === null) {
+                    throw new Error(`No se pudo obtener la tasa de cambio de ${from.getCode()} a ${to.getCode()}`);
+                }
+            }
+
+            rate = cachedRate;
+            result = amount * rate;
+        }
+
+        // Crea el objeto de conversión y lo guarda en el historial
+        const conversion: Conversion = new Conversion(from, to, amount, result, rate);
+        this.history.unshift(conversion);
+        this.saveHistoryToStorage();
+        return conversion;
+    }
+
+    /**
+     * Limpia el historial de conversiones y lo borra de localStorage.
+     */
+    public clearHistory(): void {
+        this.history = [];
+        localStorage.removeItem(HISTORY_KEY);
+    }
+
+    /**
+     * Retorna el historial de conversiones en memoria.
+     */
+    public getHistory(): Conversion[] {
+        return this.history;
+    }
+
+    /**
+     * Limpia el cache de tasas de cambio
+     */
+    public clearRatesCache(): void {
+        this.exchangeRates.clearCache();
+    }
+
+    /**
+     * Guarda el historial actual en localStorage.
+     */
+    private saveHistoryToStorage(): void {
+        localStorage.setItem(HISTORY_KEY, JSON.stringify(this.history.map((c: Conversion) => c.toJSON())));
+    }
+
+    /**
+     * Carga el historial desde localStorage (si existe).
+     */
+    private loadHistoryFromStorage(): void {
+        const json: string | null = localStorage.getItem(HISTORY_KEY);
+        if (!json) return;
+        try {
+            this.history = JSON.parse(json).map((item: any) => Conversion.fromJSON(item));
+        } catch (error) {
+            console.error('Error loading history from storage:', error);
+            this.history = [];
+        }
+    }
 }

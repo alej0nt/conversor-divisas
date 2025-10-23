@@ -1,6 +1,6 @@
 /**
  * Servicio central del conversor de divisas.
- * Maneja las tasas de cambio, las monedas disponibles y el historial de conversiones.
+ * Maneja las tasas de cambio desde la API, las monedas disponibles y el historial de conversiones.
  */
 import { Currency } from "../models/Currency.js";
 import { Conversion } from "../models/Conversion.js";
@@ -16,14 +16,8 @@ export class CurrencyService {
          * Monedas que el usuario puede usar en el conversor.
          */
         this.availableCurrencies = [];
-        const description = "Tasas de cambio actuales en el año 2025";
-        // Inicializamos las tasas de cambio
-        this.exchangeRates = new ExchangeRate({
-            USD: { USD: 1, EUR: 0.85, MXN: 18.5, GBP: 0.75 },
-            EUR: { USD: 1.18, EUR: 1, MXN: 21.76, GBP: 0.88 },
-            MXN: { USD: 0.054, MXN: 1, EUR: 0.046, GBP: 0.04 },
-            GBP: { USD: 1.33, EUR: 1.14, MXN: 25.0, GBP: 1 },
-        }, description);
+        const description = "Tasas de cambio desde API";
+        this.exchangeRates = new ExchangeRate(description);
         this.history = [];
         this.loadHistoryFromStorage();
     }
@@ -53,26 +47,58 @@ export class CurrencyService {
         }
         catch (error) {
             console.error('Error fetching available currencies:', error);
+            throw error;
+        }
+    }
+    /**
+     * Obtiene las tasas de cambio para una moneda base desde la API
+     * @param baseCurrency Código de la moneda base
+     */
+    async loadExchangeRates(baseCurrency) {
+        try {
+            // Verificar si ya tenemos las tasas en cache y son válidas
+            if (this.exchangeRates.isCacheValid(baseCurrency)) {
+                return;
+            }
+            const response = await ApiService.getExchangeRates(baseCurrency);
+            if (response === null || response === void 0 ? void 0 : response.data) {
+                this.exchangeRates.updateRates(baseCurrency, response.data);
+            }
+        }
+        catch (error) {
+            console.error('Error loading exchange rates:', error);
+            throw error;
         }
     }
     /**
      * Realiza una conversión entre dos monedas y guarda el resultado en historial.
+     * Si se proporciona una tasa personalizada, la usa; de lo contrario, consulta la API.
      */
-    convert(from, to, amount, exchangeRateCustom) {
+    async convert(from, to, amount, exchangeRateCustom) {
         let result;
         let rate;
         if (exchangeRateCustom && exchangeRateCustom > 0) {
+            // Usar tasa personalizada
             result = amount * exchangeRateCustom;
             rate = exchangeRateCustom;
         }
         else {
-            // Realiza la conversión usando las tasas de cambio
-            result = this.exchangeRates.convert(from, to, amount);
-            rate = this.exchangeRates.getRate(from, to);
+            // Intentar obtener la tasa del cache
+            let cachedRate = this.exchangeRates.getRateFromCache(from, to);
+            if (cachedRate === null) {
+                // Si no está en cache o expiró, cargar desde la API
+                await this.loadExchangeRates(from.getCode());
+                cachedRate = this.exchangeRates.getRateFromCache(from, to);
+                if (cachedRate === null) {
+                    throw new Error(`No se pudo obtener la tasa de cambio de ${from.getCode()} a ${to.getCode()}`);
+                }
+            }
+            rate = cachedRate;
+            result = amount * rate;
         }
         // Crea el objeto de conversión y lo guarda en el historial
         const conversion = new Conversion(from, to, amount, result, rate);
-        this.history.push(conversion);
+        this.history.unshift(conversion);
         this.saveHistoryToStorage();
         return conversion;
     }
@@ -90,6 +116,12 @@ export class CurrencyService {
         return this.history;
     }
     /**
+     * Limpia el cache de tasas de cambio
+     */
+    clearRatesCache() {
+        this.exchangeRates.clearCache();
+    }
+    /**
      * Guarda el historial actual en localStorage.
      */
     saveHistoryToStorage() {
@@ -102,7 +134,12 @@ export class CurrencyService {
         const json = localStorage.getItem(HISTORY_KEY);
         if (!json)
             return;
-        // Convierte cada objeto JSON en una instancia de Conversion
-        this.history = JSON.parse(json).map((item) => Conversion.fromJSON(item));
+        try {
+            this.history = JSON.parse(json).map((item) => Conversion.fromJSON(item));
+        }
+        catch (error) {
+            console.error('Error loading history from storage:', error);
+            this.history = [];
+        }
     }
 }
