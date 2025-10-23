@@ -30,6 +30,7 @@ const convertBtn = document.getElementById("convertBtn");
  * Servicio central que contiene tasas y historial, se encarga de logica.
  */
 const service = new CurrencyService();
+let historicalChart = null;
 /**
  * Inicializa la aplicación cargando las monedas disponibles y llenando los selects.
  */
@@ -100,6 +101,7 @@ async function convertCurrency() {
         // Restaurar botón
         convertBtn.disabled = false;
         convertBtn.textContent = "Convertir";
+        updateHistoricalChart(from.getCode(), to.getCode());
     }
     catch (error) {
         console.error('Error converting currency:', error);
@@ -107,6 +109,45 @@ async function convertCurrency() {
         // Restaurar botón
         convertBtn.disabled = false;
         convertBtn.textContent = "Convertir";
+    }
+}
+/**
+ * Actualiza el gráfico histórico de tasas de cambio seleccionadas.
+ */
+async function updateHistoricalChart(fromCurrency, toCurrency) {
+    try {
+        const historicalRates = await CurrencyService.getLastWeekRates(fromCurrency, toCurrency);
+        console.log(historicalRates);
+        const chartData = {
+            labels: historicalRates.map(item => item.date),
+            datasets: [{
+                    label: `${fromCurrency} a ${toCurrency}`,
+                    data: historicalRates.map(item => item.rate),
+                    borderColor: 'rgb(75, 192, 192)',
+                    tension: 0.1
+                }]
+        };
+        if (historicalChart) {
+            historicalChart.destroy();
+        }
+        const ctx = document.getElementById('historicalChart');
+        historicalChart = new Chart(ctx, {
+            type: 'line',
+            data: chartData,
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Tasas de cambio históricos'
+                    }
+                }
+            }
+        });
+    }
+    catch (error) {
+        console.error('Error fetching historical rate:', error);
+        throw error;
     }
 }
 /**

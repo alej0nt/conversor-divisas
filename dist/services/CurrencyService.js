@@ -71,6 +71,23 @@ export class CurrencyService {
         }
     }
     /**
+     * Obtiene las tasas de cambio de los últimos 7 días entre dos monedas.
+     */
+    static async getLastWeekRates(fromCurrency, toCurrency) {
+        try {
+            const data = await ApiService.fetchLast7DaysRates(fromCurrency, toCurrency);
+            // Transforma los datos en el formato esperado de {date, rate} ej: [{date: "2025-10-10", rate: 0.85}, ...]
+            return Object.entries(data.rates).map(([date, ratesObj]) => ({
+                date,
+                rate: ratesObj[toCurrency]
+            }));
+        }
+        catch (error) {
+            console.error('Error fetching last week rates:', error);
+            throw error;
+        }
+    }
+    /**
      * Realiza una conversión entre dos monedas y guarda el resultado en historial.
      * Si se proporciona una tasa personalizada, la usa; de lo contrario, consulta la API.
      */

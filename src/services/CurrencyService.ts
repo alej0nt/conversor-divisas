@@ -8,7 +8,6 @@ import { Conversion } from "../models/Conversion.js";
 import { ExchangeRate } from "../models/ExchangeRate.js";
 
 import { ApiService } from "./ApiService.js";
-import type { CurrencyDetails } from "./ApiService.js";
 
 /**
  * Clave usada para guardar el historial en localStorage.
@@ -59,7 +58,7 @@ export class CurrencyService {
         try {
             const response = await ApiService.getAvailableCurrencies();
             if (response?.data) {
-                this.availableCurrencies = Object.entries(response.data as Record<string, CurrencyDetails>).map(([code, details]: [string, CurrencyDetails]) => {
+                this.availableCurrencies = Object.entries(response.data).map(([code, details]) => {
                     return new Currency(
                         code,
                         details.name,
@@ -90,6 +89,25 @@ export class CurrencyService {
             }
         } catch (error) {
             console.error('Error loading exchange rates:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Obtiene las tasas de cambio de los últimos 7 días entre dos monedas.
+     */
+    public static async getLastWeekRates(fromCurrency: string, toCurrency: string): Promise<Array<{ date: string, rate: number }>> {
+        try {
+            const data = await ApiService.fetchLast7DaysRates(fromCurrency, toCurrency);
+
+            // Transforma los datos en el formato esperado de {date, rate} ej: [{date: "2025-10-10", rate: 0.85}, ...]
+            return Object.entries(data.rates).map(([date, ratesObj]) => ({
+                date,
+                rate: ratesObj[toCurrency]!
+            }));
+
+        } catch (error) {
+            console.error('Error fetching last week rates:', error);
             throw error;
         }
     }

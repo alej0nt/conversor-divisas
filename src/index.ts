@@ -8,6 +8,7 @@ import type { Conversion } from "./models/Conversion.js";
 import { Currency } from "./models/Currency.js";
 import { CurrencyService } from "./services/CurrencyService.js";
 
+
 /** Elemento input donde el usuario escribe la cantidad a convertir.*/
 const amount = document.getElementById("amount") as HTMLInputElement;
 
@@ -39,6 +40,8 @@ const convertBtn = document.getElementById("convertBtn") as HTMLButtonElement;
  */
 const service: CurrencyService = new CurrencyService();
 
+declare const Chart: any;
+let historicalChart: any = null;
 
 /**
  * Inicializa la aplicación cargando las monedas disponibles y llenando los selects.
@@ -122,6 +125,8 @@ async function convertCurrency(): Promise<void> {
         // Restaurar botón
         convertBtn.disabled = false;
         convertBtn.textContent = "Convertir";
+
+        updateHistoricalChart(from.getCode(), to.getCode());
     } catch (error) {
         console.error('Error converting currency:', error);
         alert('Error al convertir. Por favor, intenta de nuevo.');
@@ -129,6 +134,48 @@ async function convertCurrency(): Promise<void> {
         // Restaurar botón
         convertBtn.disabled = false;
         convertBtn.textContent = "Convertir";
+    }
+}
+
+/**
+ * Actualiza el gráfico histórico de tasas de cambio seleccionadas.
+ */
+async function updateHistoricalChart(fromCurrency: string, toCurrency: string) {
+    try {
+        const historicalRates = await CurrencyService.getLastWeekRates(fromCurrency, toCurrency);
+        console.log(historicalRates);
+        
+        const chartData = {
+            labels: historicalRates.map(item => item.date),
+            datasets: [{
+                label: `${fromCurrency} a ${toCurrency}`,
+                data: historicalRates.map(item => item.rate),
+                borderColor: 'rgb(75, 192, 192)',
+                tension: 0.1
+            }]
+        };
+
+        if (historicalChart) {
+            historicalChart.destroy();
+        }
+
+        const ctx = document.getElementById('historicalChart') as HTMLCanvasElement;
+        historicalChart = new Chart(ctx, {
+            type: 'line',
+            data: chartData,
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Tasas de cambio históricos'
+                    }
+                }
+            }
+        });
+    } catch (error) {
+        console.error('Error fetching historical rate:', error);
+        throw error;
     }
 }
 
