@@ -3,7 +3,7 @@
  * Este archivo solo maneja el DOM (llenar selects, convertir, cambio). La lógica de negocio
  *   está delegada en CurrencyService.
  */
-var _a, _b;
+var _a;
 import { Currency } from "./models/Currency.js";
 import { CurrencyService } from "./services/CurrencyService.js";
 /** Elemento input donde el usuario escribe la cantidad a convertir.*/
@@ -19,9 +19,13 @@ const toCurrency = document.getElementById("to-currency");
  */
 const convertedAmount = document.getElementById("converted-amount");
 /**
- * Contenedor donde se mostrará el resultado formateado.
+ * Input para tasa de cambio personalizada (opcional).
  */
 const exchangeRateCustom = document.getElementById("exchange-rate-custom");
+/**
+ * Botón de convertir
+ */
+const convertBtn = document.getElementById("convertBtn");
 /**
  * Servicio central que contiene tasas y historial, se encarga de logica.
  */
@@ -31,11 +35,18 @@ const service = new CurrencyService();
  */
 async function initialize() {
     try {
+        // Mostrar indicador de carga si lo deseas
+        convertBtn.disabled = true;
+        convertBtn.textContent = "Cargando...";
         await service.loadAvailableCurrencies();
         fillCurrencySelectors();
+        // Restaurar botón
+        convertBtn.disabled = false;
+        convertBtn.textContent = "Convertir";
     }
     catch (error) {
         console.error('Error initializing app:', error);
+        alert('Error al cargar las monedas. Por favor, recarga la página.');
     }
 }
 /**
@@ -63,11 +74,10 @@ function fillCurrencySelectors() {
  * - Valida que las monedas seleccionadas no sean iguales.
  * - Pinta el resultado en el DOM.
  */
-function convertCurrency() {
-    console.log(exchangeRateCustom.value);
+async function convertCurrency() {
     const amountNumber = parseFloat(amount.value);
-    // Obtenemos las monedas seleccionadas segun su código ISO
-    const from = service.getAvailableCurrencies().find(c => c.getCode() === fromCurrency.value); //uso de `!` en las búsquedas (find) fuerza que exista la moneda
+    // Obtenemos las monedas seleccionadas según su código ISO
+    const from = service.getAvailableCurrencies().find(c => c.getCode() === fromCurrency.value);
     const to = service.getAvailableCurrencies().find(c => c.getCode() === toCurrency.value);
     if (isNaN(amountNumber) || amountNumber <= 0) {
         alert("Por favor, introduce una cantidad válida.");
@@ -77,20 +87,38 @@ function convertCurrency() {
         alert("Las divisas deben ser diferentes.");
         return;
     }
-    const conversion = service.convert(from, to, amountNumber, parseFloat(exchangeRateCustom.value));
-    convertedAmount.textContent = `${to.getSymbol()} ${conversion.getResult().toFixed(2)}`;
+    try {
+        // Deshabilitar botón mientras se hace la conversión
+        convertBtn.disabled = true;
+        convertBtn.textContent = "Convirtiendo...";
+        // Obtener tasa personalizada si existe
+        const customRate = exchangeRateCustom.value ? parseFloat(exchangeRateCustom.value) : undefined;
+        // Realizar la conversión (ahora es async)
+        const conversion = await service.convert(from, to, amountNumber, customRate);
+        // Mostrar resultado
+        convertedAmount.textContent = `${to.getSymbol()} ${conversion.getResult().toFixed(2)}`;
+        // Restaurar botón
+        convertBtn.disabled = false;
+        convertBtn.textContent = "Convertir";
+    }
+    catch (error) {
+        console.error('Error converting currency:', error);
+        alert('Error al convertir. Por favor, intenta de nuevo.');
+        // Restaurar botón
+        convertBtn.disabled = false;
+        convertBtn.textContent = "Convertir";
+    }
 }
 /**
  * Intercambia los select (de <-> a) y vuelve a calcular la conversión.
  */
-function changeCurrencies() {
+async function changeCurrencies() {
     const temp = fromCurrency.value;
     fromCurrency.value = toCurrency.value;
     toCurrency.value = temp;
-    convertCurrency();
 }
 // Listeners: vinculamos botones a las funciones correspondientes.
-(_a = document.getElementById("convertBtn")) === null || _a === void 0 ? void 0 : _a.addEventListener("click", () => convertCurrency());
-(_b = document.getElementById("swapBtn")) === null || _b === void 0 ? void 0 : _b.addEventListener("click", () => changeCurrencies());
+convertBtn === null || convertBtn === void 0 ? void 0 : convertBtn.addEventListener("click", () => convertCurrency());
+(_a = document.getElementById("swapBtn")) === null || _a === void 0 ? void 0 : _a.addEventListener("click", () => changeCurrencies());
 // Inicializamos la UI llenando los selects
 initialize();

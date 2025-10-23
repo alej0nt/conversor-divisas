@@ -25,25 +25,39 @@ const toCurrency = document.getElementById("to-currency") as HTMLSelectElement;
 const convertedAmount = document.getElementById("converted-amount") as HTMLElement;
 
 /**
- * Contenedor donde se mostrará el resultado formateado.
+ * Input para tasa de cambio personalizada (opcional).
  */
 const exchangeRateCustom = document.getElementById("exchange-rate-custom") as HTMLInputElement;
 
 /**
+ * Botón de convertir
+ */
+const convertBtn = document.getElementById("convertBtn") as HTMLButtonElement;
+
+/**
  * Servicio central que contiene tasas y historial, se encarga de logica.
  */
-const service : CurrencyService = new CurrencyService();
+const service: CurrencyService = new CurrencyService();
 
 
 /**
  * Inicializa la aplicación cargando las monedas disponibles y llenando los selects.
  */
-async function initialize() {
+async function initialize(): Promise<void> {
     try {
+        // Mostrar indicador de carga si lo deseas
+        convertBtn.disabled = true;
+        convertBtn.textContent = "Cargando...";
+
         await service.loadAvailableCurrencies();
         fillCurrencySelectors();
+
+        // Restaurar botón
+        convertBtn.disabled = false;
+        convertBtn.textContent = "Convertir";
     } catch (error) {
         console.error('Error initializing app:', error);
+        alert('Error al cargar las monedas. Por favor, recarga la página.');
     }
 }
 
@@ -52,20 +66,20 @@ async function initialize() {
  * Cada opción muestra el displayName de la moneda (símbolo + nombre + código).
  */
 function fillCurrencySelectors(): void {
-  // Recorre las monedas disponibles
-  service.getAvailableCurrencies().forEach(currency => {
-    // Creamos la opción para la moneda origen
-    const optionFrom : HTMLOptionElement = document.createElement("option");
-    optionFrom.value = currency.getCode();
-    optionFrom.textContent = currency.getDisplayName();
-    fromCurrency.appendChild(optionFrom);
+    // Recorre las monedas disponibles
+    service.getAvailableCurrencies().forEach(currency => {
+        // Creamos la opción para la moneda origen
+        const optionFrom: HTMLOptionElement = document.createElement("option");
+        optionFrom.value = currency.getCode();
+        optionFrom.textContent = currency.getDisplayName();
+        fromCurrency.appendChild(optionFrom);
 
-    // Creamos la opción para la moneda destino
-    const optionTo = document.createElement("option");
-    optionTo.value = currency.getCode();
-    optionTo.textContent = currency.getDisplayName();
-    toCurrency.appendChild(optionTo);
-  });
+        // Creamos la opción para la moneda destino
+        const optionTo = document.createElement("option");
+        optionTo.value = currency.getCode();
+        optionTo.textContent = currency.getDisplayName();
+        toCurrency.appendChild(optionTo);
+    });
 }
 
 /**
@@ -74,39 +88,61 @@ function fillCurrencySelectors(): void {
  * - Valida que las monedas seleccionadas no sean iguales.
  * - Pinta el resultado en el DOM.
  */
-function convertCurrency(): void {
-  console.log(exchangeRateCustom.value);
-  const amountNumber : number = parseFloat(amount.value);
-  // Obtenemos las monedas seleccionadas segun su código ISO
-  const from : Currency = service.getAvailableCurrencies().find(c => c.getCode() === fromCurrency.value)!; //uso de `!` en las búsquedas (find) fuerza que exista la moneda
-  const to : Currency = service.getAvailableCurrencies().find(c => c.getCode() === toCurrency.value)!;
+async function convertCurrency(): Promise<void> {
+    const amountNumber: number = parseFloat(amount.value);
 
-  if (isNaN(amountNumber) || amountNumber <= 0) {
-    alert("Por favor, introduce una cantidad válida.");
-    return;
-  }
+    // Obtenemos las monedas seleccionadas según su código ISO
+    const from: Currency = service.getAvailableCurrencies().find(c => c.getCode() === fromCurrency.value)!;
+    const to: Currency = service.getAvailableCurrencies().find(c => c.getCode() === toCurrency.value)!;
 
-  if (from.isEqual(to)) {
-    alert("Las divisas deben ser diferentes.");
-    return;
-  }
+    if (isNaN(amountNumber) || amountNumber <= 0) {
+        alert("Por favor, introduce una cantidad válida.");
+        return;
+    }
 
-  const conversion : Conversion = service.convert(from, to, amountNumber, parseFloat(exchangeRateCustom.value));
-  convertedAmount.textContent = `${to.getSymbol()} ${conversion.getResult().toFixed(2)}`;
+    if (from.isEqual(to)) {
+        alert("Las divisas deben ser diferentes.");
+        return;
+    }
+
+    try {
+        // Deshabilitar botón mientras se hace la conversión
+        convertBtn.disabled = true;
+        convertBtn.textContent = "Convirtiendo...";
+
+        // Obtener tasa personalizada si existe
+        const customRate = exchangeRateCustom.value ? parseFloat(exchangeRateCustom.value) : undefined;
+
+        // Realizar la conversión (ahora es async)
+        const conversion: Conversion = await service.convert(from, to, amountNumber, customRate);
+
+        // Mostrar resultado
+        convertedAmount.textContent = `${to.getSymbol()} ${conversion.getResult().toFixed(2)}`;
+
+        // Restaurar botón
+        convertBtn.disabled = false;
+        convertBtn.textContent = "Convertir";
+    } catch (error) {
+        console.error('Error converting currency:', error);
+        alert('Error al convertir. Por favor, intenta de nuevo.');
+
+        // Restaurar botón
+        convertBtn.disabled = false;
+        convertBtn.textContent = "Convertir";
+    }
 }
 
 /**
  * Intercambia los select (de <-> a) y vuelve a calcular la conversión.
  */
-function changeCurrencies(): void {
-  const temp : string = fromCurrency.value;
-  fromCurrency.value = toCurrency.value;
-  toCurrency.value = temp;
-  convertCurrency();
+async function changeCurrencies(): Promise<void> {
+    const temp: string = fromCurrency.value;
+    fromCurrency.value = toCurrency.value;
+    toCurrency.value = temp;
 }
 
 // Listeners: vinculamos botones a las funciones correspondientes.
-document.getElementById("convertBtn")?.addEventListener("click", () => convertCurrency());
+convertBtn?.addEventListener("click", () => convertCurrency());
 document.getElementById("swapBtn")?.addEventListener("click", () => changeCurrencies());
 
 // Inicializamos la UI llenando los selects
