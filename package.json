@@ -4,7 +4,7 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc && cp src/*.html dist/ && cp src/style.css dist/"
+    "build": "tsc && cp *.html dist/ && cp style.css dist/"
   },
   "devDependencies": {
     "typescript": "^5.0.0"
