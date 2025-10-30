@@ -2,10 +2,9 @@
   "name": "conversor-divisas",
   "version": "1.0.0",
   "description": "",
-  "main": "script.js",
+  "main": "dist/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc"
+    "build": "tsc && cp src/*.html dist/ && cp src/style.css dist/"
   },
   "devDependencies": {
     "typescript": "^5.0.0"
