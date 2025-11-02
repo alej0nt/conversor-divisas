@@ -25,29 +25,44 @@ convertir monedas online,
 precio dólar hoy,
 conversor,
 divisas,
-
 ">
-
 
   <title>Conversor de Divisas</title>
   <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-
 </head>
 
 <body>
-  <div class="container">
-    <div class="historyBtnContainer">
-      <button onclick="location.href='history.html'" class="historyBtn" aria-label="Ver historial"
-        title="Ver historial">
-        <i class="fa-solid fa-clock-rotate-left"></i>
-      </button>
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <div class="navbar-content">
+      <div class="navbar-brand">
+        <img src="assets/logo.png" alt="Icono de la aplicación" class="navbar-logo">
+        <span class="navbar-title">Conversor de Divisas</span>
+      </div>
+      <div class="navbar-links">
+        <a href="index.html" class="nav-link active">
+          <img src="assets/converter-icon.png" alt="Conversor">
+          <span>Conversor</span>
+        </a>
+        <a href="history.html" class="nav-link">
+          <img src="assets/history-icon.png" alt="Historial">
+          <span>Historial</span>
+        </a>
+      </div>
     </div>
+  </nav>
+
+  <!-- HERO IMAGE -->
+  <div class="hero-section">
+    <img src="assets/hero-image.png" alt="Banner decorativo de divisas" class="hero-image">
+  </div>
+
+  <div class="container">
     <h1>Conversor de Divisas</h1>
 
     <!-- INTERFAZ 1: Conversor -->
-    <section aria-label="Conversor de divisas">
+    <section aria-label="Conversor de divisas" id="converter">
       <div class="converter">
         <div class="input-container">
           <label for="amount">Cantidad</label>
@@ -61,13 +76,7 @@ divisas,
           </div>
           <div class="actions">
             <button class="swapBtn" id="swapBtn" aria-label="Intercambiar monedas" title="Intercambiar monedas">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="17 1 21 5 17 9"></polyline>
-                <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
-                <polyline points="7 23 3 19 7 15"></polyline>
-                <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
-              </svg>
+              <img src="assets/swap-icon.png" alt="Intercambiar">
             </button>
           </div>
 
@@ -82,8 +91,12 @@ divisas,
         </div>
 
         <div class="result-container" aria-live="polite">
-          <h2>Resultado</h2>
+          <div class="result-header">
+            <img src="assets/calculator-icon.png" alt="Resultado" class="result-icon">
+            <h2>Resultado</h2>
+          </div>
           <p id="converted-amount">0</p>
+          <img src="assets/success-icon.png" alt="Conversión exitosa" class="success-icon" style="display: none;">
         </div>
 
         <div class="input-container">
@@ -91,14 +104,64 @@ divisas,
           <input type="number" id="exchange-rate-custom" placeholder="Ej: 4200.50" step="0.01" min="0" />
         </div>
 
-        <canvas id="historicalChart"></canvas>
+        <div class="chart-section">
+          <div class="chart-header">
+            <img src="assets/chart-icon.png" alt="Gráfico" class="chart-icon">
+            <h3>Historial de Tasas</h3>
+          </div>
+          <canvas id="historicalChart"></canvas>
+        </div>
 
       </div>
 
     </section>
 
+    <!-- DECORATIVE ELEMENTS -->
+    <div class="decorative-background">
+      <img src="assets/money-illustration.png" alt="" class="money-illustration">
+      <img src="assets/world-map.png" alt="" class="world-map">
+    </div>
 
   </div>
+
+  <!-- FOOTER CON ONDAS Y ENLACES -->
+  <div class="footer-decoration">
+    <img src="assets/footer-pattern.png" alt="" class="footer-pattern">
+  </div>
+
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-section">
+        <h3>Navegación</h3>
+        <ul class="footer-links">
+          <li><a href="index.html">Conversor de Divisas</a></li>
+          <li><a href="history.html">Historial de Conversiones</a></li>
+          <li><a href="#converter">Ir al Conversor</a></li>
+        </ul>
+      </div>
+      
+      <div class="footer-section">
+        <h3>Recursos</h3>
+        <ul class="footer-links">
+          <li><a href="https://www.xe.com/" target="_blank" rel="noopener noreferrer">XE - Tasas de Cambio</a></li>
+          <li><a href="https://www.oanda.com/currency-converter/" target="_blank" rel="noopener noreferrer">OANDA - Conversor</a></li>
+          <li><a href="https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html" target="_blank" rel="noopener noreferrer">Banco Central Europeo</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-section">
+        <h3>Información</h3>
+        <ul class="footer-links">
+          <li><a href="https://es.wikipedia.org/wiki/Tipo_de_cambio" target="_blank" rel="noopener noreferrer">¿Qué es el tipo de cambio?</a></li>
+          <li><a href="https://www.banrep.gov.co/es/estadisticas/trm" target="_blank" rel="noopener noreferrer">TRM - Banco de la República</a></li>
+        </ul>
+      </div>
+    </div>
+    
+    <div class="footer-bottom">
+      <p>&copy; 2025 Conversor de Divisas. Todos los derechos reservados.</p>
+    </div>
+  </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <script type="module" src="dist/index.js"></script>
