@@ -3,6 +3,7 @@
  * Renderiza la tabla de conversiones y permite limpiar el historial.
  */
 import { CurrencyService } from "./services/CurrencyService.js";
+import './components/components.js'
 
 /**
  * Tabla donde se muestran las conversiones realizadas.

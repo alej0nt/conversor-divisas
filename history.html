@@ -29,35 +29,13 @@ consultar conversiones anteriores
 
 <body>
   <!-- NAVBAR -->
-  <nav class="navbar">
-    <div class="navbar-content">
-      <div class="navbar-brand">
-        <img src="assets/logo.png" alt="Icono de la aplicación" class="navbar-logo">
-        <span class="navbar-title">Conversor de Divisas</span>
-      </div>
-      <div class="navbar-links">
-        <a href="index.html" class="nav-link">
-          <img src="assets/converter-icon.png" alt="Conversor">
-          <span>Conversor</span>
-        </a>
-        <a href="history.html" class="nav-link active">
-          <img src="assets/history-icon.png" alt="Historial">
-          <span>Historial</span>
-        </a>
-      </div>
-    </div>
-  </nav>
+  <app-navbar active="history"></app-navbar>
 
   <div class="container">
     <h1>Historial de Conversiones</h1>
 
     <section aria-label="Historial de conversiones">
-      <div class="history">
-        <!-- Empty State -->
-        <div class="empty-state" id="empty-state" style="display: none;">
-          <img src="assets/empty-state.png" alt="Sin historial" class="empty-state-image">
-          <p>No hay conversiones guardadas aún</p>
-        </div>
+      <div class="history"> 
 
         <table id="history-table">
           <thead>
@@ -77,49 +55,7 @@ consultar conversiones anteriores
     </section>
   </div>
 
-  <!-- FOOTER CON ONDAS Y ENLACES -->
-  <div class="footer-decoration">
-    <img src="assets/footer-pattern.png" alt="" class="footer-pattern">
-  </div>
-
-  <footer class="footer">
-    <div class="footer-content">
-      <div class="footer-section">
-        <h3>Navegación</h3>
-        <ul class="footer-links">
-          <li><a href="index.html">Conversor de Divisas</a></li>
-          <li><a href="history.html">Historial de Conversiones</a></li>
-          <li><a href="index.html#converter">Ir al Conversor</a></li>
-        </ul>
-      </div>
-
-      <div class="footer-section">
-        <h3>Recursos</h3>
-        <ul class="footer-links">
-          <li><a href="https://www.xe.com/" target="_blank" rel="noopener noreferrer">XE - Tasas de Cambio</a></li>
-          <li><a href="https://www.oanda.com/currency-converter/" target="_blank" rel="noopener noreferrer">OANDA -
-              Conversor</a></li>
-          <li><a
-              href="https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html"
-              target="_blank" rel="noopener noreferrer">Banco Central Europeo</a></li>
-        </ul>
-      </div>
-
-      <div class="footer-section">
-        <h3>Información</h3>
-        <ul class="footer-links">
-          <li><a href="https://es.wikipedia.org/wiki/Tipo_de_cambio" target="_blank" rel="noopener noreferrer">¿Qué es
-              el tipo de cambio?</a></li>
-          <li><a href="https://www.banrep.gov.co/es/estadisticas/trm" target="_blank" rel="noopener noreferrer">TRM -
-              Banco de la República</a></li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="footer-bottom">
-      <p>&copy; 2025 Conversor de Divisas. Todos los derechos reservados.</p>
-    </div>
-  </footer>
+  <app-footer></app-footer>
 
   <script type="module" src="dist/history.js"></script>
 </body>

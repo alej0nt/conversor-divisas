@@ -42,10 +42,10 @@ export class ApiService {
      * Se usa otra API distinta (Frankfurter porque es gratuita el historial)
      */
     static async fetchLast7DaysRates(baseCurrency, toCurrency) {
-        const sevenDaysAgo = new Date();
-        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6); // Restar 6 días para obtener el rango de 7 días
+        const daysAgo = new Date();
+        daysAgo.setDate(daysAgo.getDate() - 8); // Restar 8 días para obtener el rango de 7 días
         // Formatear fechas como YYYY-MM-DD
-        const startDate = sevenDaysAgo.toISOString().split('T')[0];
+        const startDate = daysAgo.toISOString().split('T')[0];
         const url = `${FRANKFURTER_CONFIG.URL}/${startDate}..?base=${baseCurrency}&symbols=${toCurrency}`;
         try {
             const response = await fetch(url);

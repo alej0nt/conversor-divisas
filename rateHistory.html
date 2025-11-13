@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Histórico de Tasas</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <app-navbar active="historico"></app-navbar>
+  <div class="container">
+    <h1>Histórico de Tasas de Cambio</h1>
+    <section>
+      <div class="chart-section">
+        <div class="chart-header">
+          <img src="assets/chart-icon.png" alt="Gráfico" class="chart-icon">
+          <h3>Historial de Tasas</h3>
+        </div>
+        <canvas id="historicalChart"></canvas>
+      </div>
+    </section>
+  </div>
+  <app-footer></app-footer>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script type="module" src="dist/rateHistory.js"></script>
+</body>
+</html>

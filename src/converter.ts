@@ -7,7 +7,7 @@
 import type { Conversion } from "./models/Conversion.js";
 import { Currency } from "./models/Currency.js";
 import { CurrencyService } from "./services/CurrencyService.js";
-
+import './components/components.js'
 
 /** Elemento input donde el usuario escribe la cantidad a convertir.*/
 const amount = document.getElementById("amount") as HTMLInputElement;
@@ -39,9 +39,6 @@ const convertBtn = document.getElementById("convertBtn") as HTMLButtonElement;
  * Servicio central que contiene tasas y historial, se encarga de logica.
  */
 const service: CurrencyService = new CurrencyService();
-
-declare const Chart: any;
-let historicalChart: any = null;
 
 /**
  * Inicializa la aplicación cargando las monedas disponibles y llenando los selects.
@@ -122,11 +119,12 @@ async function convertCurrency(): Promise<void> {
         // Mostrar resultado
         convertedAmount.textContent = `${to.getSymbol()} ${conversion.getResult().toFixed(2)}`;
 
+
+        const verHistoricoBtn = document.getElementById('verHistoricoBtn') as HTMLButtonElement;
+        verHistoricoBtn.style.display = 'inline-block';
         // Restaurar botón
         convertBtn.disabled = false;
         convertBtn.textContent = "Convertir";
-
-        updateHistoricalChart(from.getCode(), to.getCode());
     } catch (error) {
         console.error('Error converting currency:', error);
         alert('Error al convertir. Por favor, intenta de nuevo.');
@@ -134,48 +132,6 @@ async function convertCurrency(): Promise<void> {
         // Restaurar botón
         convertBtn.disabled = false;
         convertBtn.textContent = "Convertir";
-    }
-}
-
-/**
- * Actualiza el gráfico histórico de tasas de cambio seleccionadas.
- */
-async function updateHistoricalChart(fromCurrency: string, toCurrency: string) {
-    try {
-        const historicalRates = await CurrencyService.getLastWeekRates(fromCurrency, toCurrency);
-        console.log(historicalRates);
-        
-        const chartData = {
-            labels: historicalRates.map(item => item.date),
-            datasets: [{
-                label: `${fromCurrency} a ${toCurrency}`,
-                data: historicalRates.map(item => item.rate),
-                borderColor: 'rgb(75, 192, 192)',
-                tension: 0.1
-            }]
-        };
-
-        if (historicalChart) {
-            historicalChart.destroy();
-        }
-
-        const ctx = document.getElementById('historicalChart') as HTMLCanvasElement;
-        historicalChart = new Chart(ctx, {
-            type: 'line',
-            data: chartData,
-            options: {
-                responsive: true,
-                plugins: {
-                    title: {
-                        display: true,
-                        text: 'Tasas de cambio históricos'
-                    }
-                }
-            }
-        });
-    } catch (error) {
-        console.error('Error fetching historical rate:', error);
-        throw error;
     }
 }
 
@@ -191,6 +147,12 @@ async function changeCurrencies(): Promise<void> {
 // Listeners: vinculamos botones a las funciones correspondientes.
 convertBtn?.addEventListener("click", () => convertCurrency());
 document.getElementById("swapBtn")?.addEventListener("click", () => changeCurrencies());
+document.getElementById('verHistoricoBtn')?.addEventListener('click', () => {
+    const from = fromCurrency.value;
+    const to = toCurrency.value;
+    window.location.href = `rateHistory.html?from=${from}&to=${to}`;
+});
+
 
 // Inicializamos la UI llenando los selects
 initialize();
